@@ -34,6 +34,7 @@ const translations = {
     'btn.delete': 'حذف',
     'btn.edit': 'تعديل',
     'btn.close': 'إغلاق',
+    'btn.retry': 'إعادة المحاولة',
     
     // Search and filters
     'search.placeholder': 'البحث بالكود أو الاسم أو رقم الهاتف...',
@@ -44,11 +45,15 @@ const translations = {
     'status.good': 'جيد',
     'status.fair': 'مقبول',
     'status.poor': 'ضعيف',
+    'status.unknown': 'غير محدد',
     
     // Messages
     'msg.noCustomers': 'لا توجد بيانات عملاء',
+    'msg.noCustomersDesc': 'ابدأ بإضافة بيانات العملاء لتحليل سلوكهم الشرائي والائتماني',
     'msg.noSearchResults': 'لا توجد نتائج للبحث',
+    'msg.noSearchResultsDesc': 'جرب البحث بمصطلحات أخرى أو امسح مربع البحث لعرض جميع العملاء',
     'msg.loading': 'جاري التحميل...',
+    'msg.loadingCustomers': 'يتم جلب بيانات العملاء من قاعدة البيانات',
     'msg.error': 'حدث خطأ',
     
     // Customer fields
@@ -62,6 +67,50 @@ const translations = {
     'field.lastPayment': 'آخر دفعة',
     'field.totalDebt': 'إجمالي الدين',
     'field.status': 'الحالة',
+
+    // Stats
+    'stats.totalCustomers': 'إجمالي العملاء',
+    'stats.avgCreditScore': 'متوسط الدرجة الائتمانية',
+    'stats.paymentRate': 'معدل الالتزام بالدفع',
+    'stats.behaviorIndex': 'مؤشر سلوك الشراء',
+
+    // Dialog
+    'dialog.confirmDelete': 'تأكيد الحذف',
+    'dialog.confirmDeleteDesc': 'هل أنت متأكد من حذف هذا العميل؟ هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع البيانات المرتبطة بهذا العميل.',
+    'dialog.addCustomer': 'إضافة عميل جديد',
+
+    // Sections
+    'section.basicInfo': 'المعلومات الأساسية',
+    'section.ratings': 'التقييمات والمؤشرات',
+
+    // Placeholders
+    'placeholder.customerCode': 'مثال: C001',
+    'placeholder.name': 'اسم العميل الكامل',
+
+    // Validation
+    'validation.customerCodeRequired': 'كود العميل مطلوب',
+    'validation.nameRequired': 'اسم العميل مطلوب',
+    'validation.phoneRequired': 'رقم الهاتف مطلوب',
+    'validation.phoneInvalid': 'رقم الهاتف غير صحيح',
+    'validation.creditScoreRange': 'الدرجة الائتمانية يجب أن تكون بين 300 و 850',
+    'validation.debtNegative': 'إجمالي الدين لا يمكن أن يكون سالباً',
+
+    // Toast messages
+    'toast.dataError': 'خطأ في البيانات',
+    'toast.fixErrors': 'يرجى تصحيح الأخطاء قبل الحفظ',
+    'toast.customerAdded': 'تم إضافة العميل بنجاح',
+    'toast.customerAddedDesc': 'تم إضافة {name} إلى قاعدة البيانات',
+
+    // Currency
+    'currency': 'ج.م',
+
+    // Additional messages
+    'msg.selectCustomer': 'اختر عميلاً لعرض تحليل الدفع',
+    'msg.selectCustomerDesc': 'قم بإضافة بيانات العملاء أولاً ثم اختر عميلاً من قائمة العملاء لعرض تحليل مفصل لتاريخ دفعاته',
+    'msg.orSelectFrom': 'أو اختر من العملاء المتاحين:',
+
+    // Button labels
+    'btn.saveCustomer': 'حفظ العميل',
   },
   en: {
     // Header
@@ -85,6 +134,7 @@ const translations = {
     'btn.delete': 'Delete',
     'btn.edit': 'Edit',
     'btn.close': 'Close',
+    'btn.retry': 'Retry',
     
     // Search and filters
     'search.placeholder': 'Search by code, name, or phone...',
@@ -95,11 +145,15 @@ const translations = {
     'status.good': 'Good',
     'status.fair': 'Fair',
     'status.poor': 'Poor',
+    'status.unknown': 'Unknown',
     
     // Messages
     'msg.noCustomers': 'No customer data available',
+    'msg.noCustomersDesc': 'Start by adding customer data to analyze their purchasing and credit behavior',
     'msg.noSearchResults': 'No search results found',
+    'msg.noSearchResultsDesc': 'Try searching with different terms or clear the search box to view all customers',
     'msg.loading': 'Loading...',
+    'msg.loadingCustomers': 'Fetching customer data from database',
     'msg.error': 'An error occurred',
     
     // Customer fields
@@ -113,6 +167,50 @@ const translations = {
     'field.lastPayment': 'Last Payment',
     'field.totalDebt': 'Total Debt',
     'field.status': 'Status',
+
+    // Stats
+    'stats.totalCustomers': 'Total Customers',
+    'stats.avgCreditScore': 'Average Credit Score',
+    'stats.paymentRate': 'Payment Commitment Rate',
+    'stats.behaviorIndex': 'Purchase Behavior Index',
+
+    // Dialog
+    'dialog.confirmDelete': 'Confirm Delete',
+    'dialog.confirmDeleteDesc': 'Are you sure you want to delete this customer? This action cannot be undone and will delete all data associated with this customer.',
+    'dialog.addCustomer': 'Add New Customer',
+
+    // Sections
+    'section.basicInfo': 'Basic Information',
+    'section.ratings': 'Ratings and Indicators',
+
+    // Placeholders
+    'placeholder.customerCode': 'e.g., C001',
+    'placeholder.name': 'Full customer name',
+
+    // Validation
+    'validation.customerCodeRequired': 'Customer code is required',
+    'validation.nameRequired': 'Customer name is required',
+    'validation.phoneRequired': 'Phone number is required',
+    'validation.phoneInvalid': 'Invalid phone number',
+    'validation.creditScoreRange': 'Credit score must be between 300 and 850',
+    'validation.debtNegative': 'Total debt cannot be negative',
+
+    // Toast messages
+    'toast.dataError': 'Data Error',
+    'toast.fixErrors': 'Please fix errors before saving',
+    'toast.customerAdded': 'Customer Added Successfully',
+    'toast.customerAddedDesc': '{name} has been added to the database',
+
+    // Currency
+    'currency': 'EGP',
+
+    // Additional messages
+    'msg.selectCustomer': 'Select a customer to view payment analysis',
+    'msg.selectCustomerDesc': 'Add customer data first, then select a customer from the customer list to view detailed payment history analysis',
+    'msg.orSelectFrom': 'Or select from available customers:',
+
+    // Button labels
+    'btn.saveCustomer': 'Save Customer',
   }
 };
 

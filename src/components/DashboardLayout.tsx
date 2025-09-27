@@ -15,28 +15,28 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   
   const stats = [
     {
-      title: t('stats.totalCustomers') || "إجمالي العملاء",
+      title: t('stats.totalCustomers'),
       value: "0",
       change: "--",
       icon: Users,
       trend: "neutral"
     },
     {
-      title: t('stats.avgCreditScore') || "متوسط الدرجة الائتمانية",
+      title: t('stats.avgCreditScore'),
       value: "--",
       change: "--",
       icon: CreditCard,
       trend: "neutral"
     },
     {
-      title: t('stats.paymentRate') || "معدل الالتزام بالدفع",
+      title: t('stats.paymentRate'),
       value: "--",
       change: "--",
       icon: TrendingUp,
       trend: "neutral"
     },
     {
-      title: t('stats.behaviorIndex') || "مؤشر سلوك الشراء",
+      title: t('stats.behaviorIndex'),
       value: "--",
       change: "--",
       icon: BarChart3,

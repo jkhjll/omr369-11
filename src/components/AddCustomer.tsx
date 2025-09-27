@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Slider } from "@/components/ui/slider";
 import { UserPlus, Save, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CustomerData {
   id?: string;
@@ -28,6 +29,7 @@ interface AddCustomerProps {
 }
 
 export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<CustomerData>({
     customerCode: '',
@@ -48,25 +50,25 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     const newErrors: Partial<Record<keyof CustomerData, string>> = {};
 
     if (!formData.customerCode.trim()) {
-      newErrors.customerCode = 'كود العميل مطلوب';
+      newErrors.customerCode = t('validation.customerCodeRequired') || 'Customer code is required';
     }
 
     if (!formData.name.trim()) {
-      newErrors.name = 'اسم العميل مطلوب';
+      newErrors.name = t('validation.nameRequired') || 'Customer name is required';
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = 'رقم الهاتف مطلوب';
+      newErrors.phone = t('validation.phoneRequired') || 'Phone number is required';
     } else if (!/^[0-9+\-\s()]+$/.test(formData.phone)) {
-      newErrors.phone = 'رقم الهاتف غير صحيح';
+      newErrors.phone = t('validation.phoneInvalid') || 'Invalid phone number';
     }
 
     if (formData.creditScore < 300 || formData.creditScore > 850) {
-      newErrors.creditScore = 'الدرجة الائتمانية يجب أن تكون بين 300 و 850';
+      newErrors.creditScore = t('validation.creditScoreRange') || 'Credit score must be between 300 and 850';
     }
 
     if (formData.totalDebt < 0) {
-      newErrors.totalDebt = 'إجمالي الدين لا يمكن أن يكون سالباً';
+      newErrors.totalDebt = t('validation.debtNegative') || 'Total debt cannot be negative';
     }
 
     setErrors(newErrors);
@@ -97,8 +99,8 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
   const handleSubmit = () => {
     if (!validateForm()) {
       toast({
-        title: "خطأ في البيانات",
-        description: "يرجى تصحيح الأخطاء قبل الحفظ",
+        title: t('toast.dataError') || "Data Error",
+        description: t('toast.fixErrors') || "Please fix errors before saving",
         variant: "destructive",
       });
       return;
@@ -128,8 +130,8 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     setIsOpen(false);
     
     toast({
-      title: "تم إضافة العميل بنجاح",
-      description: `تم إضافة ${newCustomer.name} إلى قاعدة البيانات`,
+      title: t('toast.customerAdded') || "Customer Added Successfully",
+      description: t('toast.customerAddedDesc')?.replace('{name}', newCustomer.name) || `${newCustomer.name} has been added to the database`,
     });
   };
 
@@ -149,10 +151,10 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
   const getStatusLabel = (status: CustomerData['status']) => {
     switch (status) {
-      case 'excellent': return 'ممتاز';
-      case 'good': return 'جيد';
-      case 'fair': return 'مقبول';
-      case 'poor': return 'ضعيف';
+      case 'excellent': return t('status.excellent');
+      case 'good': return t('status.good');
+      case 'fair': return t('status.fair');
+      case 'poor': return t('status.poor');
     }
   };
 
@@ -166,40 +168,40 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">إضافة عميل جديد</DialogTitle>
+          <DialogTitle className="text-xl">{t('dialog.addCustomer') || 'Add New Customer'}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* المعلومات الأساسية */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">المعلومات الأساسية</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('section.basicInfo') || 'Basic Information'}</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="customerCode">كود العميل *</Label>
+                <Label htmlFor="customerCode">{t('field.customerCode')} *</Label>
                 <Input
                   id="customerCode"
                   value={formData.customerCode}
                   onChange={(e) => handleInputChange('customerCode', e.target.value)}
-                  placeholder="مثال: C001"
+                  placeholder={t('placeholder.customerCode') || 'e.g., C001'}
                   className={errors.customerCode ? 'border-destructive' : ''}
                 />
                 {errors.customerCode && <p className="text-sm text-destructive mt-1">{errors.customerCode}</p>}
               </div>
 
               <div>
-                <Label htmlFor="name">اسم العميل *</Label>
+                <Label htmlFor="name">{t('field.name')} *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="اسم العميل الكامل"
+                  placeholder={t('placeholder.name') || 'Full customer name'}
                   className={errors.name ? 'border-destructive' : ''}
                 />
                 {errors.name && <p className="text-sm text-destructive mt-1">{errors.name}</p>}
               </div>
 
               <div>
-                <Label htmlFor="phone">رقم الهاتف *</Label>
+                <Label htmlFor="phone">{t('field.phone')} *</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -211,7 +213,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
               </div>
 
               <div>
-                <Label htmlFor="lastPayment">تاريخ آخر دفعة</Label>
+                <Label htmlFor="lastPayment">{t('field.lastPayment')}</Label>
                 <Input
                   id="lastPayment"
                   type="date"
@@ -221,7 +223,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
               </div>
 
               <div>
-                <Label htmlFor="totalDebt">إجمالي الدين (ج.م)</Label>
+                <Label htmlFor="totalDebt">{t('field.totalDebt')} ({t('currency') || 'EGP'})</Label>
                 <Input
                   id="totalDebt"
                   type="number"
@@ -238,10 +240,10 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
           {/* التقييمات والمؤشرات */}
           <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">التقييمات والمؤشرات</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('section.ratings') || 'Ratings and Indicators'}</h3>
             <div className="space-y-6">
               <div>
-                <Label htmlFor="creditScore">الدرجة الائتمانية (300-850)</Label>
+                <Label htmlFor="creditScore">{t('field.creditScore')} (300-850)</Label>
                 <div className="mt-2">
                   <Slider
                     value={[formData.creditScore]}
@@ -261,7 +263,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
               </div>
 
               <div>
-                <Label htmlFor="paymentCommitment">التزام الدفع (%)</Label>
+                <Label htmlFor="paymentCommitment">{t('field.paymentCommitment')} (%)</Label>
                 <div className="mt-2">
                   <Slider
                     value={[formData.paymentCommitment]}
@@ -281,7 +283,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="hagglingLevel">مستوى المساومة (1-10)</Label>
+                  <Label htmlFor="hagglingLevel">{t('field.hagglingLevel')} (1-10)</Label>
                   <div className="mt-2">
                     <Slider
                       value={[formData.hagglingLevel]}
@@ -300,7 +302,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
                 </div>
 
                 <div>
-                  <Label htmlFor="purchaseWillingness">استعداد الشراء (1-10)</Label>
+                  <Label htmlFor="purchaseWillingness">{t('field.purchaseWillingness')} (1-10)</Label>
                   <div className="mt-2">
                     <Slider
                       value={[formData.purchaseWillingness]}
@@ -320,17 +322,17 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
               </div>
 
               <div>
-                <Label htmlFor="status">حالة العميل</Label>
+                <Label htmlFor="status">{t('field.status')}</Label>
                 <div className="mt-2 flex items-center gap-4">
                   <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="excellent">ممتاز</SelectItem>
-                      <SelectItem value="good">جيد</SelectItem>
-                      <SelectItem value="fair">مقبول</SelectItem>
-                      <SelectItem value="poor">ضعيف</SelectItem>
+                      <SelectItem value="excellent">{t('status.excellent')}</SelectItem>
+                      <SelectItem value="good">{t('status.good')}</SelectItem>
+                      <SelectItem value="fair">{t('status.fair')}</SelectItem>
+                      <SelectItem value="poor">{t('status.poor')}</SelectItem>
                     </SelectContent>
                   </Select>
                   <span className={`text-sm font-medium ${getStatusColor(formData.status)}`}>
@@ -345,11 +347,11 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
           <div className="flex justify-end gap-3 pt-4 border-t">
             <Button variant="outline" onClick={handleCancel}>
               <X className="h-4 w-4 ml-2" />
-              إلغاء
+              {t('btn.cancel')}
             </Button>
             <Button onClick={handleSubmit} className="gradient-secondary text-secondary-foreground">
               <Save className="h-4 w-4 ml-2" />
-              حفظ العميل
+              {t('btn.saveCustomer') || 'Save Customer'}
             </Button>
           </div>
         </div>

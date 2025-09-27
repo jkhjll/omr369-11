@@ -126,7 +126,7 @@ const Index = () => {
                   <Loader2 className="h-16 w-16 mx-auto text-primary mb-4 animate-spin" />
                   <h3 className="text-lg font-semibold mb-2">{t('msg.loading')}</h3>
                   <p className="text-muted-foreground">
-                    {t('msg.loadingCustomers') || 'يتم جلب بيانات العملاء من قاعدة البيانات'}
+                    {t('msg.loadingCustomers')}
                   </p>
                 </div>
               </Card>
@@ -137,7 +137,7 @@ const Index = () => {
                   <h3 className="text-lg font-semibold mb-2">{t('msg.error')}</h3>
                   <p className="text-muted-foreground mb-4">{error}</p>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    {t('btn.retry') || 'إعادة المحاولة'}
+                    {t('btn.retry')}
                   </Button>
                 </div>
               </Card>
@@ -146,12 +146,12 @@ const Index = () => {
                 <div className="max-w-md mx-auto">
                   <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
-                    {customers.length === 0 ? 'لا توجد بيانات عملاء' : 'لا توجد نتائج للبحث'}
+                    {customers.length === 0 ? t('msg.noCustomers') : t('msg.noSearchResults')}
                   </h3>
                   <p className="text-muted-foreground">
                     {customers.length === 0 
-                      ? t('msg.noCustomersDesc') || 'ابدأ بإضافة بيانات العملاء لتحليل سلوكهم الشرائي والائتماني'
-                      : t('msg.noSearchResultsDesc') || 'جرب البحث بمصطلحات أخرى أو امسح مربع البحث لعرض جميع العملاء'
+                      ? t('msg.noCustomersDesc')
+                      : t('msg.noSearchResultsDesc')
                     }
                   </p>
                 </div>
@@ -183,13 +183,13 @@ const Index = () => {
             <Card className="p-12 text-center shadow-soft">
               <div className="max-w-md mx-auto">
                 <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">اختر عميلاً لعرض تحليل الدفع</h3>
+                <h3 className="text-lg font-semibold mb-2">{t('msg.selectCustomer') || 'Select a customer to view payment analysis'}</h3>
                 <p className="text-muted-foreground">
-                  قم بإضافة بيانات العملاء أولاً ثم اختر عميلاً من قائمة العملاء لعرض تحليل مفصل لتاريخ دفعاته
+                  {t('msg.selectCustomerDesc') || 'Add customer data first, then select a customer from the customer list to view detailed payment history analysis'}
                 </p>
                 {customers.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-sm text-muted-foreground mb-2">أو اختر من العملاء المتاحين:</p>
+                    <p className="text-sm text-muted-foreground mb-2">{t('msg.orSelectFrom') || 'Or select from available customers:'}</p>
                     <div className="flex flex-wrap gap-2 justify-center">
                       {customers.slice(0, 5).map((customer) => (
                         <Button

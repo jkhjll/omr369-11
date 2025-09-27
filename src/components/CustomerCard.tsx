@@ -45,7 +45,7 @@ export function CustomerCard({ customer, onViewDetails, onDelete }: CustomerCard
       case 'good': return t('status.good');
       case 'fair': return t('status.fair');
       case 'poor': return t('status.poor');
-      default: return t('status.unknown') || 'غير محدد';
+      default: return t('status.unknown');
     }
   };
 
@@ -150,7 +150,7 @@ export function CustomerCard({ customer, onViewDetails, onDelete }: CustomerCard
                 <AlertDialogHeader>
                   <AlertDialogTitle>{t('dialog.confirmDelete') || 'تأكيد الحذف'}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    {t('dialog.confirmDeleteDesc') || `هل أنت متأكد من حذف العميل "${customer.name}"؟ هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع البيانات المرتبطة بهذا العميل.`}
+                    {t('dialog.confirmDeleteDesc').replace('{name}', customer.name)}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
