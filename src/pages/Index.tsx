@@ -154,6 +154,7 @@ const Index = () => {
                   key={customer.id}
                   customer={customer}
                   onViewDetails={handleViewCustomerDetails}
+                  onDelete={deleteCustomer}
                 />
               ))
             )}

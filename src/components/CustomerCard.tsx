@@ -2,7 +2,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { User, CreditCard, TrendingUp, MessageSquare } from "lucide-react";
+import { User, CreditCard, TrendingUp, MessageSquare, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface Customer {
   id: string;
@@ -20,9 +21,10 @@ interface Customer {
 interface CustomerCardProps {
   customer: Customer;
   onViewDetails: (customerId: string) => void;
+  onDelete?: (customerId: string) => void;
 }
 
-export function CustomerCard({ customer, onViewDetails }: CustomerCardProps) {
+export function CustomerCard({ customer, onViewDetails, onDelete }: CustomerCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'excellent': return 'bg-success text-success-foreground';
@@ -120,12 +122,46 @@ export function CustomerCard({ customer, onViewDetails }: CustomerCardProps) {
           </div>
         </div>
 
-        <Button 
-          onClick={() => onViewDetails(customer.id)}
-          className="w-full mt-4 gradient-primary text-primary-foreground"
-        >
-          عرض التفاصيل
-        </Button>
+        <div className="flex gap-2 mt-4">
+          <Button 
+            onClick={() => onViewDetails(customer.id)}
+            className="flex-1 gradient-primary text-primary-foreground"
+          >
+            عرض التفاصيل
+          </Button>
+          
+          {onDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon"
+                  className="text-destructive hover:text-destructive-foreground hover:bg-destructive"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    هل أنت متأكد من حذف العميل "{customer.name}"؟ 
+                    هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع البيانات المرتبطة بهذا العميل.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>إلغاء</AlertDialogCancel>
+                  <AlertDialogAction 
+                    onClick={() => onDelete(customer.id)}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    حذف
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </div>
     </Card>
   );
