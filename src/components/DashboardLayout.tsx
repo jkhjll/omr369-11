@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Users, CreditCard } from "lucide-react";
+import { ChartBar as BarChart3, TrendingUp, Users, CreditCard } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { LiveClock } from "@/components/LiveClock";
