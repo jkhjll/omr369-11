@@ -12,8 +12,10 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Filter, Download, Users, Loader as Loader2 } from "lucide-react";
 import { useCustomers, CustomerData } from "@/hooks/useCustomers";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>("");
@@ -76,11 +78,11 @@ const Index = () => {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="customers" className="flex items-center gap-2">
             <Users className="h-4 w-4" />
-            العملاء
+            {t('nav.customers')}
           </TabsTrigger>
-          <TabsTrigger value="credit-calculator">حاسبة الائتمان</TabsTrigger>
-          <TabsTrigger value="payment-analysis">تحليل الدفع</TabsTrigger>
-          <TabsTrigger value="reports">التقارير</TabsTrigger>
+          <TabsTrigger value="credit-calculator">{t('nav.creditCalculator')}</TabsTrigger>
+          <TabsTrigger value="payment-analysis">{t('nav.paymentAnalysis')}</TabsTrigger>
+          <TabsTrigger value="reports">{t('nav.reports')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="customers" className="space-y-6">
@@ -91,7 +93,7 @@ const Index = () => {
                 <div className="relative flex-1 md:w-80">
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="البحث بالكود أو الاسم أو رقم الهاتف..."
+                    placeholder={t('search.placeholder')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-10"
@@ -110,7 +112,7 @@ const Index = () => {
                   className="gradient-secondary text-secondary-foreground"
                 >
                   <Download className="h-4 w-4 ml-2" />
-                  تصدير البيانات
+                  {t('btn.exportData')}
                 </Button>
               </div>
             </div>
@@ -122,9 +124,9 @@ const Index = () => {
               <Card className="col-span-full p-12 text-center shadow-soft">
                 <div className="max-w-md mx-auto">
                   <Loader2 className="h-16 w-16 mx-auto text-primary mb-4 animate-spin" />
-                  <h3 className="text-lg font-semibold mb-2">جاري تحميل البيانات...</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('msg.loading')}</h3>
                   <p className="text-muted-foreground">
-                    يتم جلب بيانات العملاء من قاعدة البيانات
+                    {t('msg.loadingCustomers') || 'يتم جلب بيانات العملاء من قاعدة البيانات'}
                   </p>
                 </div>
               </Card>
@@ -132,10 +134,10 @@ const Index = () => {
               <Card className="col-span-full p-12 text-center shadow-soft">
                 <div className="max-w-md mx-auto">
                   <Users className="h-16 w-16 mx-auto text-destructive mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">حدث خطأ في تحميل البيانات</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('msg.error')}</h3>
                   <p className="text-muted-foreground mb-4">{error}</p>
                   <Button onClick={() => window.location.reload()} variant="outline">
-                    إعادة المحاولة
+                    {t('btn.retry') || 'إعادة المحاولة'}
                   </Button>
                 </div>
               </Card>
@@ -148,8 +150,8 @@ const Index = () => {
                   </h3>
                   <p className="text-muted-foreground">
                     {customers.length === 0 
-                      ? 'ابدأ بإضافة بيانات العملاء لتحليل سلوكهم الشرائي والائتماني'
-                      : 'جرب البحث بمصطلحات أخرى أو امسح مربع البحث لعرض جميع العملاء'
+                      ? t('msg.noCustomersDesc') || 'ابدأ بإضافة بيانات العملاء لتحليل سلوكهم الشرائي والائتماني'
+                      : t('msg.noSearchResultsDesc') || 'جرب البحث بمصطلحات أخرى أو امسح مربع البحث لعرض جميع العملاء'
                     }
                   </p>
                 </div>

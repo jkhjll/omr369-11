@@ -128,7 +128,6 @@ All colors MUST be HSL. Professional financial dashboard theme.
 
   body {
     @apply bg-background text-foreground font-cairo;
-    direction: rtl;
   }
 
   /* Arabic Typography & RTL Support */

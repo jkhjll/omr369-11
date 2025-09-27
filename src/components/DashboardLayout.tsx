@@ -2,37 +2,41 @@ import { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
 import { BarChart3, TrendingUp, Users, CreditCard } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import { LiveClock } from "@/components/LiveClock";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
+  const { t } = useLanguage();
+  
   const stats = [
     {
-      title: "إجمالي العملاء",
+      title: t('stats.totalCustomers') || "إجمالي العملاء",
       value: "0",
       change: "--",
       icon: Users,
       trend: "neutral"
     },
     {
-      title: "متوسط الدرجة الائتمانية",
+      title: t('stats.avgCreditScore') || "متوسط الدرجة الائتمانية",
       value: "--",
       change: "--",
       icon: CreditCard,
       trend: "neutral"
     },
     {
-      title: "معدل الالتزام بالدفع",
+      title: t('stats.paymentRate') || "معدل الالتزام بالدفع",
       value: "--",
       change: "--",
       icon: TrendingUp,
       trend: "neutral"
     },
     {
-      title: "مؤشر سلوك الشراء",
+      title: t('stats.behaviorIndex') || "مؤشر سلوك الشراء",
       value: "--",
       change: "--",
       icon: BarChart3,
@@ -48,16 +52,17 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent">
-                نظام تحليل سلوك العملاء
+                {t('system.title')}
               </h1>
               <p className="text-muted-foreground mt-1">
-                تحليل متطور لسلوك العملاء والائتمان
+                {t('system.subtitle')}
               </p>
             </div>
             <div className="flex items-center gap-4">
+              <LanguageToggle />
               <ThemeToggle />
               <div className="text-left">
-                <p className="text-sm text-muted-foreground">آخر تحديث</p>
+                <p className="text-sm text-muted-foreground">{t('system.lastUpdate')}</p>
                 <p className="font-medium">{new Date().toLocaleDateString('ar-EG')}</p>
                 <LiveClock />
               </div>
