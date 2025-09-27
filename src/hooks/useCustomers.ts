@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 
 export interface CustomerData {
   id: string;
+  customerCode: string;
   name: string;
   phone: string;
   creditScore: number;
@@ -20,6 +21,7 @@ export interface CustomerData {
 export interface DatabaseCustomer {
   id: string;
   user_id: string;
+  customer_code: string;
   name: string;
   phone: string;
   credit_score: number;
@@ -36,6 +38,7 @@ export interface DatabaseCustomer {
 // تحويل من نموذج قاعدة البيانات إلى نموذج التطبيق
 const transformFromDatabase = (dbCustomer: DatabaseCustomer): CustomerData => ({
   id: dbCustomer.id,
+  customerCode: dbCustomer.customer_code,
   name: dbCustomer.name,
   phone: dbCustomer.phone,
   creditScore: dbCustomer.credit_score,
@@ -51,6 +54,7 @@ const transformFromDatabase = (dbCustomer: DatabaseCustomer): CustomerData => ({
 
 // تحويل من نموذج التطبيق إلى نموذج قاعدة البيانات
 const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>) => ({
+  customer_code: customer.customerCode,
   name: customer.name,
   phone: customer.phone,
   credit_score: customer.creditScore,

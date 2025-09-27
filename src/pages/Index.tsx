@@ -26,7 +26,9 @@ const Index = () => {
   } = useCustomers();
 
   const filteredCustomers = customers.filter(customer =>
-    customer.name.includes(searchTerm) || customer.phone.includes(searchTerm)
+    customer.name.includes(searchTerm) || 
+    customer.phone.includes(searchTerm) || 
+    customer.customerCode.includes(searchTerm)
   );
 
   const handleViewCustomerDetails = (customerId: string) => {
@@ -50,10 +52,10 @@ const Index = () => {
 
     const csvContent = [
       // Headers
-      'name,phone,creditScore,paymentCommitment,hagglingLevel,purchaseWillingness,lastPayment,totalDebt,status',
+      'customerCode,name,phone,creditScore,paymentCommitment,hagglingLevel,purchaseWillingness,lastPayment,totalDebt,status',
       // Data rows
       ...customers.map(customer => 
-        `"${customer.name}","${customer.phone}",${customer.creditScore},${customer.paymentCommitment},${customer.hagglingLevel},${customer.purchaseWillingness},"${customer.lastPayment}",${customer.totalDebt},"${customer.status}"`
+        `"${customer.customerCode}","${customer.name}","${customer.phone}",${customer.creditScore},${customer.paymentCommitment},${customer.hagglingLevel},${customer.purchaseWillingness},"${customer.lastPayment}",${customer.totalDebt},"${customer.status}"`
       )
     ].join('\n');
 
@@ -85,7 +87,7 @@ const Index = () => {
                 <div className="relative flex-1 md:w-80">
                   <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="البحث بالاسم أو رقم الهاتف..."
+                    placeholder="البحث بالكود أو الاسم أو رقم الهاتف..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pr-10"
