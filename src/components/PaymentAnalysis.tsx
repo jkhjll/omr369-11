@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CalendarDays, Clock, TrendingDown, TrendingUp, AlertCircle } from "lucide-react";
+import { CalendarDays, Clock, TrendingDown, TrendingUp, CircleAlert as AlertCircle } from "lucide-react";
 import { usePaymentRecords, PaymentRecord } from "@/hooks/usePaymentRecords";
 import { useState } from "react";
 

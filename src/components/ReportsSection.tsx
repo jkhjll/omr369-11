@@ -7,18 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  FileText, 
-  Download, 
-  Plus, 
-  BarChart3, 
-  TrendingUp, 
-  Users, 
-  CreditCard,
-  Calendar,
-  Trash2,
-  Eye
-} from "lucide-react";
+import { FileText, Download, Plus, ChartBar as BarChart3, TrendingUp, Users, CreditCard, Calendar, Trash2, Eye } from "lucide-react";
 import { useReports, Report } from "@/hooks/useReports";
 import { useCustomers } from "@/hooks/useCustomers";
 import { usePaymentRecords } from "@/hooks/usePaymentRecords";
