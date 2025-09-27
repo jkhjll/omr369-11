@@ -7,6 +7,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 interface Customer {
   id: string;
+  customerCode: string;
   name: string;
   phone: string;
   creditScore: number;
@@ -53,6 +54,7 @@ export function CustomerCard({ customer, onViewDetails, onDelete }: CustomerCard
             <User className="h-5 w-5 text-primary" />
           </div>
           <div>
+            <p className="text-xs text-muted-foreground">{customer.customerCode}</p>
             <h3 className="font-semibold text-lg">{customer.name}</h3>
             <p className="text-sm text-muted-foreground">{customer.phone}</p>
           </div>

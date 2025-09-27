@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface CustomerData {
   id?: string;
+  customerCode: string;
   name: string;
   phone: string;
   creditScore: number;
@@ -29,6 +30,7 @@ interface AddCustomerProps {
 export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<CustomerData>({
+    customerCode: '',
     name: '',
     phone: '',
     creditScore: 650,
@@ -44,6 +46,10 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CustomerData, string>> = {};
+
+    if (!formData.customerCode.trim()) {
+      newErrors.customerCode = 'كود العميل مطلوب';
+    }
 
     if (!formData.name.trim()) {
       newErrors.name = 'اسم العميل مطلوب';
@@ -107,6 +113,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     
     // إعادة تعيين النموذج
     setFormData({
+      customerCode: '',
       name: '',
       phone: '',
       creditScore: 650,
@@ -167,6 +174,18 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">المعلومات الأساسية</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="customerCode">كود العميل *</Label>
+                <Input
+                  id="customerCode"
+                  value={formData.customerCode}
+                  onChange={(e) => handleInputChange('customerCode', e.target.value)}
+                  placeholder="مثال: C001"
+                  className={errors.customerCode ? 'border-destructive' : ''}
+                />
+                {errors.customerCode && <p className="text-sm text-destructive mt-1">{errors.customerCode}</p>}
+              </div>
+
               <div>
                 <Label htmlFor="name">اسم العميل *</Label>
                 <Input
