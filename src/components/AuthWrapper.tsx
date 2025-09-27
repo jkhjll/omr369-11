@@ -63,7 +63,7 @@ export function AuthWrapper({
       if (error) {
         toast({
           title: "خطأ في تسجيل الدخول",
-          description: error.message,
+          description: `${error.message}. يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى.`,
           variant: "destructive"
         });
       } else {
@@ -98,7 +98,7 @@ export function AuthWrapper({
       if (error) {
         toast({
           title: "خطأ في إنشاء الحساب",
-          description: error.message,
+          description: `${error.message}. يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى.`,
           variant: "destructive"
         });
       } else {
