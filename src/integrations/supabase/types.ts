@@ -74,6 +74,7 @@ export type Database = {
         Row: {
           created_at: string
           credit_score: number
+          customer_code: string
           haggling_level: number
           id: string
           last_payment: string | null
@@ -89,6 +90,7 @@ export type Database = {
         Insert: {
           created_at?: string
           credit_score: number
+          customer_code: string
           haggling_level: number
           id?: string
           last_payment?: string | null
@@ -104,6 +106,7 @@ export type Database = {
         Update: {
           created_at?: string
           credit_score?: number
+          customer_code?: string
           haggling_level?: number
           id?: string
           last_payment?: string | null
@@ -113,6 +116,124 @@ export type Database = {
           purchase_willingness?: number
           status?: string
           total_debt?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      payment_records: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_id: string
+          days_late: number | null
+          due_date: string
+          id: string
+          notes: string | null
+          paid_date: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_id: string
+          days_late?: number | null
+          due_date: string
+          id?: string
+          notes?: string | null
+          paid_date?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_id?: string
+          days_late?: number | null
+          due_date?: string
+          id?: string
+          notes?: string | null
+          paid_date?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_payment_records_customer"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_data: {
+        Row: {
+          created_at: string
+          data_type: string
+          data_value: Json
+          id: string
+          report_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_type: string
+          data_value: Json
+          id?: string
+          report_id: string
+        }
+        Update: {
+          created_at?: string
+          data_type?: string
+          data_value?: Json
+          id?: string
+          report_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_report_data_report"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reports: {
+        Row: {
+          created_at: string
+          data: Json | null
+          description: string | null
+          filters: Json | null
+          id: string
+          report_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          description?: string | null
+          filters?: Json | null
+          id?: string
+          report_type: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          description?: string | null
+          filters?: Json | null
+          id?: string
+          report_type?: string
+          title?: string
           updated_at?: string
           user_id?: string
         }

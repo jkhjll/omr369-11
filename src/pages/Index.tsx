@@ -5,6 +5,7 @@ import { CreditLimitCalculator } from "@/components/CreditLimitCalculator";
 import { PaymentAnalysis } from "@/components/PaymentAnalysis";
 import { DataImport } from "@/components/DataImport";
 import { AddCustomer } from "@/components/AddCustomer";
+import { ReportsSection } from "@/components/ReportsSection";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ import { useCustomers, CustomerData } from "@/hooks/useCustomers";
 const Index = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
+  const [selectedCustomerName, setSelectedCustomerName] = useState<string>("");
   const { 
     customers, 
     loading, 
@@ -32,7 +34,9 @@ const Index = () => {
   );
 
   const handleViewCustomerDetails = (customerId: string) => {
+    const customer = customers.find(c => c.id === customerId);
     setSelectedCustomer(customerId);
+    setSelectedCustomerName(customer?.name || "");
   };
 
   const handleDataImported = async (importedData: (CustomerData & { id: string })[]) => {
@@ -168,30 +172,43 @@ const Index = () => {
         </TabsContent>
 
         <TabsContent value="payment-analysis">
-          <Card className="p-12 text-center shadow-soft">
-            <div className="max-w-md mx-auto">
-              <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">اختر عميلاً لعرض تحليل الدفع</h3>
-              <p className="text-muted-foreground">
-                قم بإضافة بيانات العملاء أولاً ثم اختر عميلاً لعرض تحليل مفصل لتاريخ دفعاته
-              </p>
-            </div>
-          </Card>
+          {selectedCustomer && selectedCustomerName ? (
+            <PaymentAnalysis 
+              customerId={selectedCustomer} 
+              customerName={selectedCustomerName}
+            />
+          ) : (
+            <Card className="p-12 text-center shadow-soft">
+              <div className="max-w-md mx-auto">
+                <Users className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <h3 className="text-lg font-semibold mb-2">اختر عميلاً لعرض تحليل الدفع</h3>
+                <p className="text-muted-foreground">
+                  قم بإضافة بيانات العملاء أولاً ثم اختر عميلاً من قائمة العملاء لعرض تحليل مفصل لتاريخ دفعاته
+                </p>
+                {customers.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm text-muted-foreground mb-2">أو اختر من العملاء المتاحين:</p>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {customers.slice(0, 5).map((customer) => (
+                        <Button
+                          key={customer.id}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleViewCustomerDetails(customer.id)}
+                        >
+                          {customer.name}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="reports">
-          <Card className="p-12 text-center shadow-soft">
-            <div className="max-w-md mx-auto">
-              <Download className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">التقارير والتحليلات</h3>
-              <p className="text-muted-foreground mb-6">
-                قريباً: تقارير شاملة وتحليلات متقدمة لسلوك العملاء
-              </p>
-              <Button className="gradient-accent text-accent-foreground">
-                طلب تقرير مخصص
-              </Button>
-            </div>
-          </Card>
+          <ReportsSection />
         </TabsContent>
       </Tabs>
     </DashboardLayout>

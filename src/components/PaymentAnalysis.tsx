@@ -1,37 +1,44 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CalendarDays, Clock, TrendingDown, TrendingUp, AlertCircle } from "lucide-react";
-
-interface PaymentRecord {
-  id: string;
-  dueDate: string;
-  paidDate: string | null;
-  amount: number;
-  status: 'paid' | 'late' | 'pending' | 'missed';
-  daysLate?: number;
-}
+import { usePaymentRecords, PaymentRecord } from "@/hooks/usePaymentRecords";
+import { useState } from "react";
 
 interface PaymentAnalysisProps {
   customerId: string;
   customerName: string;
-  paymentHistory: PaymentRecord[];
 }
 
-export function PaymentAnalysis({ customerId, customerName, paymentHistory }: PaymentAnalysisProps) {
+export function PaymentAnalysis({ customerId, customerName }: PaymentAnalysisProps) {
+  const { paymentRecords, loading, addPaymentRecord, updatePaymentRecord, deletePaymentRecord } = usePaymentRecords(customerId);
+  const [isAddingPayment, setIsAddingPayment] = useState(false);
+  const [newPayment, setNewPayment] = useState({
+    dueDate: '',
+    paidDate: '',
+    amount: 0,
+    status: 'pending' as PaymentRecord['status'],
+    notes: ''
+  });
+
   // Calculate metrics
-  const totalPayments = paymentHistory.length;
-  const paidOnTime = paymentHistory.filter(p => p.status === 'paid' && !p.daysLate).length;
-  const latePayments = paymentHistory.filter(p => p.status === 'late' || (p.daysLate && p.daysLate > 0)).length;
-  const missedPayments = paymentHistory.filter(p => p.status === 'missed').length;
-  const pendingPayments = paymentHistory.filter(p => p.status === 'pending').length;
+  const totalPayments = paymentRecords.length;
+  const paidOnTime = paymentRecords.filter(p => p.status === 'paid' && (!p.daysLate || p.daysLate === 0)).length;
+  const latePayments = paymentRecords.filter(p => p.status === 'late' || (p.daysLate && p.daysLate > 0)).length;
+  const missedPayments = paymentRecords.filter(p => p.status === 'missed').length;
+  const pendingPayments = paymentRecords.filter(p => p.status === 'pending').length;
 
   const onTimeRate = totalPayments > 0 ? (paidOnTime / totalPayments) * 100 : 0;
   const lateRate = totalPayments > 0 ? (latePayments / totalPayments) * 100 : 0;
   const missedRate = totalPayments > 0 ? (missedPayments / totalPayments) * 100 : 0;
 
   // Average days late
-  const lateDays = paymentHistory
+  const lateDays = paymentRecords
     .filter(p => p.daysLate && p.daysLate > 0)
     .map(p => p.daysLate || 0);
   const avgDaysLate = lateDays.length > 0 ? lateDays.reduce((a, b) => a + b, 0) / lateDays.length : 0;
@@ -66,6 +73,42 @@ export function PaymentAnalysis({ customerId, customerName, paymentHistory }: Pa
 
   const commitmentLevel = getCommitmentLevel(onTimeRate);
 
+  const handleAddPayment = async () => {
+    if (!newPayment.dueDate || newPayment.amount <= 0) {
+      return;
+    }
+
+    const success = await addPaymentRecord({
+      customerId,
+      dueDate: newPayment.dueDate,
+      paidDate: newPayment.paidDate || null,
+      amount: newPayment.amount,
+      status: newPayment.status,
+      notes: newPayment.notes,
+    });
+
+    if (success) {
+      setIsAddingPayment(false);
+      setNewPayment({
+        dueDate: '',
+        paidDate: '',
+        amount: 0,
+        status: 'pending',
+        notes: ''
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card className="p-6 shadow-soft">
+        <div className="text-center">
+          <p>جاري تحميل بيانات الدفع...</p>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -78,12 +121,87 @@ export function PaymentAnalysis({ customerId, customerName, paymentHistory }: Pa
             </h2>
             <p className="text-muted-foreground">العميل: {customerName}</p>
           </div>
-          <div className="text-center">
+          <div className="flex items-center gap-4">
+            <Dialog open={isAddingPayment} onOpenChange={setIsAddingPayment}>
+              <DialogTrigger asChild>
+                <Button className="gradient-primary text-primary-foreground">
+                  إضافة دفعة
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>إضافة دفعة جديدة</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="dueDate">تاريخ الاستحقاق</Label>
+                    <Input
+                      id="dueDate"
+                      type="date"
+                      value={newPayment.dueDate}
+                      onChange={(e) => setNewPayment(prev => ({ ...prev, dueDate: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="paidDate">تاريخ الدفع (اختياري)</Label>
+                    <Input
+                      id="paidDate"
+                      type="date"
+                      value={newPayment.paidDate}
+                      onChange={(e) => setNewPayment(prev => ({ ...prev, paidDate: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="amount">المبلغ (ج.م)</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      min="0"
+                      value={newPayment.amount}
+                      onChange={(e) => setNewPayment(prev => ({ ...prev, amount: parseFloat(e.target.value) || 0 }))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="status">الحالة</Label>
+                    <Select value={newPayment.status} onValueChange={(value) => setNewPayment(prev => ({ ...prev, status: value as PaymentRecord['status'] }))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pending">معلق</SelectItem>
+                        <SelectItem value="paid">مدفوع</SelectItem>
+                        <SelectItem value="late">متأخر</SelectItem>
+                        <SelectItem value="missed">فائت</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="notes">ملاحظات</Label>
+                    <Input
+                      id="notes"
+                      value={newPayment.notes}
+                      onChange={(e) => setNewPayment(prev => ({ ...prev, notes: e.target.value }))}
+                      placeholder="ملاحظات إضافية..."
+                    />
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => setIsAddingPayment(false)}>
+                      إلغاء
+                    </Button>
+                    <Button onClick={handleAddPayment}>
+                      حفظ
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
+            <div className="text-center">
             <p className="text-sm text-muted-foreground">مستوى الالتزام</p>
             <p className={`text-2xl font-bold ${commitmentLevel.color}`}>
               {commitmentLevel.text}
             </p>
             <p className="text-sm">({onTimeRate.toFixed(1)}%)</p>
+          </div>
           </div>
         </div>
 
@@ -156,7 +274,7 @@ export function PaymentAnalysis({ customerId, customerName, paymentHistory }: Pa
       <Card className="p-6 shadow-soft">
         <h3 className="text-lg font-semibold mb-4">تاريخ الدفعات الأخيرة</h3>
         <div className="space-y-3 max-h-64 overflow-y-auto">
-          {paymentHistory.slice(0, 10).map((payment) => (
+          {paymentRecords.slice(0, 10).map((payment) => (
             <div key={payment.id} className="flex items-center justify-between p-3 rounded-lg border">
               <div className="flex items-center gap-3">
                 <div className="text-right">
@@ -166,7 +284,7 @@ export function PaymentAnalysis({ customerId, customerName, paymentHistory }: Pa
                   </p>
                   {payment.paidDate && (
                     <p className="text-xs text-muted-foreground">
-                      تاريخ الدفع: {new Date(payment.paidDate).toLocaleDateString('ar-EG')}
+                      تاريخ الدفع: {payment.paidDate}
                     </p>
                   )}
                 </div>
@@ -186,6 +304,12 @@ export function PaymentAnalysis({ customerId, customerName, paymentHistory }: Pa
             </div>
           ))}
         </div>
+        {paymentRecords.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">لا توجد سجلات دفع لهذا العميل</p>
+            <p className="text-sm text-muted-foreground mt-2">ابدأ بإضافة سجلات الدفع لتحليل سلوك العميل</p>
+          </div>
+        )}
       </Card>
     </div>
   );
