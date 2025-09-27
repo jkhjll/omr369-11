@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, Download, Users, Loader2 } from "lucide-react";
+import { Search, Filter, Download, Users, Loader as Loader2 } from "lucide-react";
 import { useCustomers, CustomerData } from "@/hooks/useCustomers";
 
 const Index = () => {
