@@ -6,13 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, FileText, AlertCircle, CheckCircle, X } from "lucide-react";
+import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
 
 interface CustomerData {
   id?: string;
-  customerCode: string;
   name: string;
   phone: string;
   creditScore: number;
@@ -40,10 +39,6 @@ export function DataImport({ onDataImported }: DataImportProps) {
 
   const validateCustomerData = (data: any): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
-    
-    if (!data.customerCode || typeof data.customerCode !== 'string') {
-      errors.push('كود العميل مطلوب ويجب أن يكون نص');
-    }
     
     if (!data.name || typeof data.name !== 'string') {
       errors.push('اسم العميل مطلوب ويجب أن يكون نص');
@@ -192,18 +187,17 @@ export function DataImport({ onDataImported }: DataImportProps) {
         if (line.includes('|') || line.includes('\t')) {
           // محاولة تحليل البيانات المفصولة بـ | أو tab
           const parts = line.split(/[|\t]/).map(p => p.trim());
-          if (parts.length >= 9) {
+          if (parts.length >= 8) {
             const customer: any = {
-              customerCode: parts[0],
-              name: parts[1],
-              phone: parts[2],
-              creditScore: parseFloat(parts[3]) || 0,
-              paymentCommitment: parseFloat(parts[4]) || 0,
-              hagglingLevel: parseFloat(parts[5]) || 0,
-              purchaseWillingness: parseFloat(parts[6]) || 0,
-              lastPayment: parts[7],
-              totalDebt: parseFloat(parts[8]) || 0,
-              status: parts[9] || 'fair'
+              name: parts[0],
+              phone: parts[1],
+              creditScore: parseFloat(parts[2]) || 0,
+              paymentCommitment: parseFloat(parts[3]) || 0,
+              hagglingLevel: parseFloat(parts[4]) || 0,
+              purchaseWillingness: parseFloat(parts[5]) || 0,
+              lastPayment: parts[6],
+              totalDebt: parseFloat(parts[7]) || 0,
+              status: parts[8] || 'fair'
             };
             customers.push(customer);
           }
@@ -311,10 +305,10 @@ export function DataImport({ onDataImported }: DataImportProps) {
   const downloadTemplate = () => {
     // إنشاء نموذج Excel
     const templateData = [
-      ['customerCode', 'name', 'phone', 'creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'lastPayment', 'totalDebt', 'status'],
-      ['C001', 'أحمد محمد علي', '01012345678', 785, 94, 6, 8, '15/12/2024', 12500, 'excellent'],
-      ['C002', 'فاطمة أحمد محمود', '01098765432', 692, 87, 8, 9, '10/12/2024', 8900, 'good'],
-      ['C003', 'محمد أحمد سعد', '01055567890', 620, 75, 7, 6, '08/12/2024', 15000, 'fair']
+      ['name', 'phone', 'creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'lastPayment', 'totalDebt', 'status'],
+      ['أحمد محمد علي', '01012345678', 785, 94, 6, 8, '15/12/2024', 12500, 'excellent'],
+      ['فاطمة أحمد محمود', '01098765432', 692, 87, 8, 9, '10/12/2024', 8900, 'good'],
+      ['محمد أحمد سعد', '01055567890', 620, 75, 7, 6, '08/12/2024', 15000, 'fair']
     ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(templateData);
@@ -424,7 +418,6 @@ export function DataImport({ onDataImported }: DataImportProps) {
                   <table className="w-full text-sm">
                     <thead className="bg-muted sticky top-0">
                       <tr>
-                        <th className="text-right p-2 border-b">كود العميل</th>
                         <th className="text-right p-2 border-b">الاسم</th>
                         <th className="text-right p-2 border-b">الهاتف</th>
                         <th className="text-right p-2 border-b">الدرجة الائتمانية</th>
@@ -435,7 +428,6 @@ export function DataImport({ onDataImported }: DataImportProps) {
                     <tbody>
                       {previewData.slice(0, 50).map((customer, index) => (
                         <tr key={index} className="border-b">
-                          <td className="p-2">{customer.customerCode}</td>
                           <td className="p-2">{customer.name}</td>
                           <td className="p-2">{customer.phone}</td>
                           <td className="p-2">{customer.creditScore}</td>
@@ -480,7 +472,6 @@ export function DataImport({ onDataImported }: DataImportProps) {
           <Card className="p-4 bg-muted/50">
             <h4 className="font-semibold mb-2">الحقول المطلوبة في الملف:</h4>
             <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
-              <div>• customerCode (كود العميل)</div>
               <div>• name (الاسم)</div>
               <div>• phone (الهاتف)</div>
               <div>• creditScore (الدرجة الائتمانية: 300-850)</div>
