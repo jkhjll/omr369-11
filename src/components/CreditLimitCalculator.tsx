@@ -17,6 +17,7 @@ interface Customer {
 }
 
 export function CreditLimitCalculator() {
+  const { t } = useLanguage();
   const { toast } = useToast();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
@@ -234,9 +235,9 @@ export function CreditLimitCalculator() {
           <Calculator className="h-6 w-6 text-accent" />
         </div>
         <div>
-          <h2 className="text-xl font-bold">حاسبة الحد الائتماني</h2>
+          <h2 className="text-xl font-bold">{t('creditCalc.title')}</h2>
           <p className="text-sm text-muted-foreground">
-            احسب الحد الائتماني المناسب بناءً على البيانات المالية
+            {t('creditCalc.subtitle')}
           </p>
         </div>
       </div>
@@ -244,10 +245,10 @@ export function CreditLimitCalculator() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
-            <Label htmlFor="customer">العميل (اختياري)</Label>
+            <Label htmlFor="customer">{t('creditCalc.customer')}</Label>
             <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
               <SelectTrigger>
-                <SelectValue placeholder="اختر عميلاً (اختياري)" />
+                <SelectValue placeholder={t('creditCalc.selectCustomer')} />
               </SelectTrigger>
               <SelectContent>
                 {customers.map((customer) => (
@@ -260,33 +261,33 @@ export function CreditLimitCalculator() {
           </div>
 
           <div>
-            <Label htmlFor="monthlyIncome">الدخل الشهري (ج.م)</Label>
+            <Label htmlFor="monthlyIncome">{t('creditCalc.monthlyIncome')}</Label>
             <Input
               id="monthlyIncome"
               type="number"
-              placeholder="مثال: 15000"
+              placeholder={t('creditCalc.monthlyIncomeExample')}
               value={formData.monthlyIncome}
               onChange={(e) => setFormData(prev => ({ ...prev, monthlyIncome: e.target.value }))}
             />
           </div>
 
           <div>
-            <Label htmlFor="currentDebt">إجمالي الديون الحالية (ج.م)</Label>
+            <Label htmlFor="currentDebt">{t('creditCalc.currentDebt')}</Label>
             <Input
               id="currentDebt"
               type="number"
-              placeholder="مثال: 5000"
+              placeholder={t('creditCalc.currentDebtExample')}
               value={formData.currentDebt}
               onChange={(e) => setFormData(prev => ({ ...prev, currentDebt: e.target.value }))}
             />
           </div>
 
           <div>
-            <Label htmlFor="creditScore">الدرجة الائتمانية</Label>
+            <Label htmlFor="creditScore">{t('creditCalc.creditScore')}</Label>
             <Input
               id="creditScore"
               type="number"
-              placeholder="مثال: 750"
+              placeholder={t('creditCalc.creditScoreExample')}
               min="300"
               max="850"
               value={formData.creditScore}
@@ -295,11 +296,11 @@ export function CreditLimitCalculator() {
           </div>
 
           <div>
-            <Label htmlFor="paymentHistory">تاريخ الدفع (%)</Label>
+            <Label htmlFor="paymentHistory">{t('creditCalc.paymentHistory')}</Label>
             <Input
               id="paymentHistory"
               type="number"
-              placeholder="مثال: 95"
+              placeholder={t('creditCalc.paymentHistoryExample')}
               min="0"
               max="100"
               value={formData.paymentHistory}
@@ -308,11 +309,11 @@ export function CreditLimitCalculator() {
           </div>
 
           <div>
-            <Label htmlFor="yearsWithStore">عدد سنوات التعامل</Label>
+            <Label htmlFor="yearsWithStore">{t('creditCalc.yearsWithStore')}</Label>
             <Input
               id="yearsWithStore"
               type="number"
-              placeholder="مثال: 2"
+              placeholder={t('creditCalc.yearsExample')}
               min="0"
               value={formData.yearsWithStore}
               onChange={(e) => setFormData(prev => ({ ...prev, yearsWithStore: e.target.value }))}
@@ -324,19 +325,19 @@ export function CreditLimitCalculator() {
             className="w-full gradient-accent text-accent-foreground"
             disabled={!formData.monthlyIncome || !formData.creditScore || !formData.paymentHistory}
           >
-            احسب الحد الائتماني
+            {t('creditCalc.calculate')}
           </Button>
         </div>
 
         {result && (
           <div className="space-y-6">
             <div className="text-center p-6 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border">
-              <h3 className="text-lg font-semibold mb-2">الحد الائتماني المقترح</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('creditCalc.suggestedLimit')}</h3>
               <p className="text-3xl font-bold text-primary mb-2">
                 {result.creditLimit.toLocaleString('ar-EG')} ج.م
               </p>
               <div className="flex items-center justify-center gap-2">
-                <span className="text-sm">مستوى المخاطر:</span>
+                <span className="text-sm">{t('creditCalc.riskLevel')}:</span>
                 <Badge className={getRiskColor(result.riskLevel)}>
                   {getRiskText(result.riskLevel)}
                 </Badge>
@@ -348,7 +349,7 @@ export function CreditLimitCalculator() {
             <div>
               <h4 className="font-semibold mb-4 flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                العوامل المؤثرة
+                {t('creditCalc.factors')}
               </h4>
               <div className="space-y-3">
                 {result.factors.map((factor, index) => (
@@ -372,11 +373,11 @@ export function CreditLimitCalculator() {
               disabled={saving}
             >
               {saving ? (
-                <>جاري الحفظ...</>
+                <>{t('creditCalc.saving')}</>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  حفظ النتيجة
+                  {t('creditCalc.saveResult')}
                 </>
               )}
             </Button>

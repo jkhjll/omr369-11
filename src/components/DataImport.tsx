@@ -324,7 +324,7 @@ export function DataImport({ onDataImported }: DataImportProps) {
       <DialogTrigger asChild>
         <Button variant="outline" className="gradient-primary text-primary-foreground">
           <Upload className="h-4 w-4 ml-2" />
-          استيراد البيانات
+          {t('btn.importData')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">

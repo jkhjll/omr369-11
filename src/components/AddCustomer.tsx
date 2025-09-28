@@ -163,7 +163,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
       <DialogTrigger asChild>
         <Button className="gradient-accent text-accent-foreground">
           <UserPlus className="h-4 w-4 ml-2" />
-          إضافة عميل
+          {t('btn.addCustomer')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">

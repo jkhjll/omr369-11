@@ -111,6 +111,38 @@ const translations = {
 
     // Button labels
     'btn.saveCustomer': 'حفظ العميل',
+
+    // Credit Calculator
+    'creditCalc.title': 'حاسبة الحد الائتماني',
+    'creditCalc.subtitle': 'احسب الحد الائتماني المناسب بناءً على البيانات المالية',
+    'creditCalc.customer': 'العميل (اختياري)',
+    'creditCalc.selectCustomer': 'اختر عميلاً (اختياري)',
+    'creditCalc.monthlyIncome': 'الدخل الشهري (ج.م)',
+    'creditCalc.monthlyIncomeExample': 'مثال: 15000',
+    'creditCalc.currentDebt': 'إجمالي الديون الحالية (ج.م)',
+    'creditCalc.currentDebtExample': 'مثال: 5000',
+    'creditCalc.creditScore': 'الدرجة الائتمانية',
+    'creditCalc.creditScoreExample': 'مثال: 750',
+    'creditCalc.paymentHistory': 'تاريخ الدفع (%)',
+    'creditCalc.paymentHistoryExample': 'مثال: 95',
+    'creditCalc.yearsWithStore': 'عدد سنوات التعامل',
+    'creditCalc.yearsExample': 'مثال: 2',
+    'creditCalc.calculate': 'احسب الحد الائتماني',
+    'creditCalc.suggestedLimit': 'الحد الائتماني المقترح',
+    'creditCalc.riskLevel': 'مستوى المخاطر',
+    'creditCalc.factors': 'العوامل المؤثرة',
+    'creditCalc.saving': 'جاري الحفظ...',
+    'creditCalc.saveResult': 'حفظ النتيجة',
+
+    // Reports
+    'reports.title': 'التقارير والتحليلات',
+    'reports.subtitle': 'إنشاء وإدارة التقارير التحليلية',
+    'reports.customerReport': 'تقرير العملاء',
+    'reports.paymentReport': 'تقرير الدفع',
+    'reports.customReport': 'تقرير مخصص',
+    'reports.noReports': 'لا توجد تقارير',
+    'reports.noReportsDesc': 'ابدأ بإنشاء تقارير تحليلية لبيانات العملاء والدفعات',
+    'reports.createFirst': 'إنشاء أول تقرير',
   },
   en: {
     // Header
@@ -211,6 +243,38 @@ const translations = {
 
     // Button labels
     'btn.saveCustomer': 'Save Customer',
+
+    // Credit Calculator
+    'creditCalc.title': 'Credit Limit Calculator',
+    'creditCalc.subtitle': 'Calculate appropriate credit limit based on financial data',
+    'creditCalc.customer': 'Customer (Optional)',
+    'creditCalc.selectCustomer': 'Select a customer (optional)',
+    'creditCalc.monthlyIncome': 'Monthly Income (EGP)',
+    'creditCalc.monthlyIncomeExample': 'e.g., 15000',
+    'creditCalc.currentDebt': 'Total Current Debt (EGP)',
+    'creditCalc.currentDebtExample': 'e.g., 5000',
+    'creditCalc.creditScore': 'Credit Score',
+    'creditCalc.creditScoreExample': 'e.g., 750',
+    'creditCalc.paymentHistory': 'Payment History (%)',
+    'creditCalc.paymentHistoryExample': 'e.g., 95',
+    'creditCalc.yearsWithStore': 'Years with Store',
+    'creditCalc.yearsExample': 'e.g., 2',
+    'creditCalc.calculate': 'Calculate Credit Limit',
+    'creditCalc.suggestedLimit': 'Suggested Credit Limit',
+    'creditCalc.riskLevel': 'Risk Level',
+    'creditCalc.factors': 'Influencing Factors',
+    'creditCalc.saving': 'Saving...',
+    'creditCalc.saveResult': 'Save Result',
+
+    // Reports
+    'reports.title': 'Reports and Analytics',
+    'reports.subtitle': 'Create and manage analytical reports',
+    'reports.customerReport': 'Customer Report',
+    'reports.paymentReport': 'Payment Report',
+    'reports.customReport': 'Custom Report',
+    'reports.noReports': 'No reports available',
+    'reports.noReportsDesc': 'Start by creating analytical reports for customer and payment data',
+    'reports.createFirst': 'Create First Report',
   }
 };
 
