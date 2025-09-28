@@ -66,9 +66,7 @@ const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | '
     purchase_willingness: customer.purchaseWillingness,
     last_payment: customer.lastPayment || null,
     total_debt: customer.totalDebt,
-    installment_amount: customer.installmentAmount || 0,
     status: customer.status,
-    customer_code: customer.customerCode,
   };
 };
 
@@ -130,7 +128,7 @@ export const useCustomers = () => {
       const { data, error } = await supabase
         .from('customers')
         .insert([dbCustomer])
-        .select()
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id')
         .single();
 
       if (error) {
@@ -173,7 +171,7 @@ export const useCustomers = () => {
       const { data, error } = await supabase
         .from('customers')
         .insert(dbCustomers)
-        .select();
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id');
 
       if (error) {
         throw error;
@@ -208,7 +206,7 @@ export const useCustomers = () => {
         .from('customers')
         .update(dbUpdate)
         .eq('id', id)
-        .select()
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id')
         .single();
 
       if (error) {
