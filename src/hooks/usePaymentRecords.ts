@@ -128,7 +128,7 @@ export const usePaymentRecords = (customerId?: string) => {
 
       const dbRecord = {
         ...transformToDatabase(recordData),
-        user_id: session.session.user.id,
+        user_id: session.user.id,
       };
 
       const { data, error } = await supabase

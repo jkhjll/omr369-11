@@ -139,7 +139,7 @@ export const useCustomers = () => {
       }
 
       const insertPayload = {
-        user_id: session.session.user.id,
+        user_id: session.user.id,
         name: customerData.name,
         phone: customerData.phone,
         credit_score: customerData.creditScore,

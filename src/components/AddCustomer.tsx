@@ -26,7 +26,7 @@ interface CustomerData {
 }
 
 interface AddCustomerProps {
-  onCustomerAdded: (customer: CustomerData & { id: string }) => void;
+  onCustomerAdded: (customer: CustomerData & { id: string }) => Promise<boolean>;
 }
 
 export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
@@ -116,7 +116,12 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     };
 
     try {
-      await onCustomerAdded(newCustomer);
+      const success = await onCustomerAdded(newCustomer);
+      
+      if (!success) {
+        // الخطأ تم التعامل معه بالفعل في onCustomerAdded
+        return;
+      }
       
       // إعادة تعيين النموذج فقط في حالة النجاح
       setFormData({
@@ -138,7 +143,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
       
     } catch (error) {
       console.error('خطأ في إضافة العميل:', error);
-      // لا نقوم بإعادة تعيين النموذج في حالة الخطأ
+      // الخطأ تم التعامل معه بالفعل، لا حاجة لإظهار رسالة إضافية
     }
   }, [formData, validateForm, onCustomerAdded, toast, t]);
     

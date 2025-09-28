@@ -42,16 +42,8 @@ const Index = () => {
   };
 
   const handleCustomerAdded = async (newCustomer: CustomerData & { id: string }) => {
-    try {
-      const { id, ...customerData } = newCustomer;
-      const success = await addCustomer(customerData);
-      
-      if (!success) {
-        throw new Error('فشل في إضافة العميل');
-      }
-    } catch (error) {
-      throw error; // إعادة رمي الخطأ ليتم التعامل معه في AddCustomer
-    }
+    const { id, ...customerData } = newCustomer;
+    return await addCustomer(customerData);
   };
 
   const handleExportData = () => {

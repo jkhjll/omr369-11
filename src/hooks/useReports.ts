@@ -114,7 +114,7 @@ export const useReports = () => {
 
       const dbReport = {
         ...transformToDatabase(reportData),
-        user_id: session.session.user.id,
+        user_id: session.user.id,
       };
 
       const { data, error } = await supabase
