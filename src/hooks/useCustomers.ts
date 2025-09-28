@@ -92,7 +92,7 @@ export const useCustomers = () => {
 
       const { data, error: fetchError } = await supabase
         .from('customers')
-        .select('*')
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id')
         .order('created_at', { ascending: false });
 
       if (fetchError) {
