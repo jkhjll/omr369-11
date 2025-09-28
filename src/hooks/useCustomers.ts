@@ -49,7 +49,7 @@ const transformFromDatabase = (dbCustomer: any): CustomerData => ({
   purchaseWillingness: dbCustomer.purchase_willingness,
   lastPayment: dbCustomer.last_payment || '',
   totalDebt: Number(dbCustomer.total_debt),
-  installmentAmount: 0, // Default value since column doesn't exist in DB
+  installmentAmount: Number(dbCustomer.installment_amount) || 0,
   status: dbCustomer.status as CustomerData['status'],
   createdAt: dbCustomer.created_at,
   updatedAt: dbCustomer.updated_at,
@@ -66,6 +66,7 @@ const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | '
     purchase_willingness: customer.purchaseWillingness,
     last_payment: customer.lastPayment || null,
     total_debt: customer.totalDebt,
+    installment_amount: customer.installmentAmount,
     status: customer.status,
   };
 };
@@ -90,7 +91,7 @@ export const useCustomers = () => {
 
       const { data, error: fetchError } = await supabase
         .from('customers')
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id')
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -128,7 +129,7 @@ export const useCustomers = () => {
       const { data, error } = await supabase
         .from('customers')
         .insert([dbCustomer])
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id')
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
         .single();
 
       if (error) {
@@ -164,7 +165,7 @@ export const useCustomers = () => {
         .from('customers')
         .update(dbUpdate)
         .eq('id', id)
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id')
+        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
         .single();
 
       if (error) {
