@@ -40,7 +40,7 @@ export interface DatabaseCustomer {
 // تحويل من نموذج قاعدة البيانات إلى نموذج التطبيق
 const transformFromDatabase = (dbCustomer: any): CustomerData => ({
   id: dbCustomer.id,
-  customerCode: dbCustomer.customer_code || `CU${Date.now()}`,
+  customerCode: `CU${Date.now()}`, // Generate client-side since column doesn't exist in DB
   name: dbCustomer.name,
   phone: dbCustomer.phone,
   creditScore: dbCustomer.credit_score,
@@ -49,7 +49,7 @@ const transformFromDatabase = (dbCustomer: any): CustomerData => ({
   purchaseWillingness: dbCustomer.purchase_willingness,
   lastPayment: dbCustomer.last_payment || '',
   totalDebt: Number(dbCustomer.total_debt),
-  installmentAmount: Number(dbCustomer.installment_amount || 0),
+  installmentAmount: 0, // Default value since column doesn't exist in DB
   status: dbCustomer.status as CustomerData['status'],
   createdAt: dbCustomer.created_at,
   updatedAt: dbCustomer.updated_at,
@@ -57,7 +57,6 @@ const transformFromDatabase = (dbCustomer: any): CustomerData => ({
 
 // تحويل من نموذج التطبيق إلى نموذج قاعدة البيانات
 const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>) => ({
-  customer_code: customer.customerCode,
   name: customer.name,
   phone: customer.phone,
   credit_score: customer.creditScore,
@@ -66,7 +65,6 @@ const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | '
   purchase_willingness: customer.purchaseWillingness,
   last_payment: customer.lastPayment || null,
   total_debt: customer.totalDebt,
-  installment_amount: customer.installmentAmount,
   status: customer.status,
 });
 
