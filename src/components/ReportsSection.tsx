@@ -132,29 +132,29 @@ export function ReportsSection() {
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <BarChart3 className="h-6 w-6 text-primary" />
-              التقارير والتحليلات
+              {t('reports.title')}
             </h2>
-            <p className="text-muted-foreground">إنشاء وإدارة التقارير التحليلية</p>
+            <p className="text-muted-foreground">{t('reports.subtitle')}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button onClick={handleGenerateCustomerReport} className="gradient-primary text-primary-foreground">
               <Users className="h-4 w-4 ml-2" />
-              تقرير العملاء
+              {t('reports.customerReport')}
             </Button>
             <Button onClick={handleGeneratePaymentReport} className="gradient-secondary text-secondary-foreground">
               <CreditCard className="h-4 w-4 ml-2" />
-              تقرير الدفع
+              {t('reports.paymentReport')}
             </Button>
             <Dialog open={isCreatingReport} onOpenChange={setIsCreatingReport}>
               <DialogTrigger asChild>
                 <Button className="gradient-accent text-accent-foreground">
                   <Plus className="h-4 w-4 ml-2" />
-                  تقرير مخصص
+                  {t('reports.customReport')}
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>إنشاء تقرير مخصص</DialogTitle>
+                  <DialogTitle>{t('reports.createCustom')}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
@@ -210,13 +210,13 @@ export function ReportsSection() {
           <Card className="col-span-full p-12 text-center shadow-soft">
             <div className="max-w-md mx-auto">
               <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">لا توجد تقارير</h3>
+              <h3 className="text-lg font-semibold mb-2">{t('reports.noReports')}</h3>
               <p className="text-muted-foreground mb-6">
-                ابدأ بإنشاء تقارير تحليلية لبيانات العملاء والدفعات
+                {t('reports.noReportsDesc')}
               </p>
               <Button onClick={() => setIsCreatingReport(true)} className="gradient-primary text-primary-foreground">
                 <Plus className="h-4 w-4 ml-2" />
-                إنشاء أول تقرير
+                {t('reports.createFirst')}
               </Button>
             </div>
           </Card>

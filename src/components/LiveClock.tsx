@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function LiveClock() {
+  const { language } = useLanguage();
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -12,7 +14,7 @@ export function LiveClock() {
   }, []);
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('ar-EG', {
+    return date.toLocaleTimeString(language === 'ar' ? 'ar-EG' : 'en-US', {
       hour12: true,
       hour: '2-digit',
       minute: '2-digit',

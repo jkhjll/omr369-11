@@ -63,7 +63,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
               <ThemeToggle />
               <div className="text-left">
                 <p className="text-sm text-muted-foreground">{t('system.lastUpdate')}</p>
-                <p className="font-medium">{new Date().toLocaleDateString('ar-EG')}</p>
+                <p className="font-medium">{new Date().toLocaleDateString(language === 'ar' ? 'ar-EG' : 'en-US')}</p>
                 <LiveClock />
               </div>
             </div>
