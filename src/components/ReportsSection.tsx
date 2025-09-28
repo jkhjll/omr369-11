@@ -16,6 +16,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 
 export function ReportsSection() {
   const { reports, loading, addReport, deleteReport, generateCustomerAnalysisReport, generatePaymentAnalysisReport } = useReports();
+  const { t } = useLanguage();
   const { customers } = useCustomers();
   const { paymentRecords } = usePaymentRecords();
   const { toast } = useToast();
