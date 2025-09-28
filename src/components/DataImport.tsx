@@ -100,35 +100,88 @@ export function DataImport({ onDataImported }: DataImportProps) {
 
   const processCSV = (csvText: string): CustomerData[] => {
     const lines = csvText.split('\n').filter(line => line.trim());
-    const headers = lines[0].split(',').map(h => h.trim());
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     const data: CustomerData[] = [];
     
+    // خريطة لتحويل أسماء الأعمدة المختلفة إلى الأسماء المطلوبة
+    const columnMapping: { [key: string]: string } = {
+      'name': 'name',
+      'الاسم': 'name',
+      'اسم': 'name',
+      'phone': 'phone',
+      'الهاتف': 'phone',
+      'هاتف': 'phone',
+      'رقم الهاتف': 'phone',
+      'creditscore': 'creditScore',
+      'credit_score': 'creditScore',
+      'الدرجة الائتمانية': 'creditScore',
+      'درجة ائتمانية': 'creditScore',
+      'paymentcommitment': 'paymentCommitment',
+      'payment_commitment': 'paymentCommitment',
+      'التزام الدفع': 'paymentCommitment',
+      'التزام دفع': 'paymentCommitment',
+      'hagglinglevel': 'hagglingLevel',
+      'haggling_level': 'hagglingLevel',
+      'مستوى المساومة': 'hagglingLevel',
+      'مساومة': 'hagglingLevel',
+      'purchasewillingness': 'purchaseWillingness',
+      'purchase_willingness': 'purchaseWillingness',
+      'الرغبة في الشراء': 'purchaseWillingness',
+      'استعداد الشراء': 'purchaseWillingness',
+      'lastpayment': 'lastPayment',
+      'last_payment': 'lastPayment',
+      'آخر دفعة': 'lastPayment',
+      'اخر دفعة': 'lastPayment',
+      'totaldebt': 'totalDebt',
+      'total_debt': 'totalDebt',
+      'إجمالي الدين': 'totalDebt',
+      'اجمالي الدين': 'totalDebt',
+      'الدين': 'totalDebt',
+      'status': 'status',
+      'الحالة': 'status',
+      'حالة': 'status'
+    };
+
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim());
       const customer: any = {};
       
       headers.forEach((header, index) => {
         const value = values[index];
+        const mappedField = columnMapping[header] || header;
         
         // تحويل الأرقام
-        if (['creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'totalDebt'].includes(header)) {
-          customer[header] = parseFloat(value) || 0;
-        } else if (header === 'lastPayment') {
-          customer[header] = convertDateFormat(value);
+        if (['creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'totalDebt'].includes(mappedField)) {
+          customer[mappedField] = parseFloat(value) || 0;
+        } else if (mappedField === 'lastPayment') {
+          customer[mappedField] = convertDateFormat(value);
         } else {
-          customer[header] = value;
+          customer[mappedField] = value;
         }
       });
       
+      // التأكد من وجود جميع الحقول المطلوبة مع قيم افتراضية
+      const requiredFields = {
+        name: customer.name || '',
+        phone: customer.phone || '',
+        creditScore: customer.creditScore || 650,
+        paymentCommitment: customer.paymentCommitment || 75,
+        hagglingLevel: customer.hagglingLevel || 5,
+        purchaseWillingness: customer.purchaseWillingness || 7,
+        lastPayment: customer.lastPayment || '',
+        totalDebt: customer.totalDebt || 0,
+        status: customer.status || 'fair'
+      };
+
       // تحديد الحالة تلقائياً إذا لم تكن موجودة
-      if (!customer.status) {
-        if (customer.creditScore >= 750) customer.status = 'excellent';
-        else if (customer.creditScore >= 700) customer.status = 'good';
-        else if (customer.creditScore >= 600) customer.status = 'fair';
-        else customer.status = 'poor';
+      if (!requiredFields.status || !['excellent', 'good', 'fair', 'poor'].includes(requiredFields.status)) {
+        if (requiredFields.creditScore >= 750) requiredFields.status = 'excellent';
+        else if (requiredFields.creditScore >= 700) requiredFields.status = 'good';
+        else if (requiredFields.creditScore >= 600) requiredFields.status = 'fair';
+        else requiredFields.status = 'poor';
       }
       
-      data.push(customer);
+      data.push(requiredFields as CustomerData);
     }
     
     return data;
@@ -149,7 +202,7 @@ export function DataImport({ onDataImported }: DataImportProps) {
             throw new Error('الملف يجب أن يحتوي على صف العناوين والبيانات');
           }
           
-          const headers = (jsonData[0] as string[]).map(h => h?.toString().trim());
+          const headers = (jsonData[0] as string[]).map(h => h?.toString().trim().toLowerCase());
           const customers: CustomerData[] = [];
           
           for (let i = 1; i < jsonData.length; i++) {
@@ -158,28 +211,86 @@ export function DataImport({ onDataImported }: DataImportProps) {
             
             const customer: any = {};
             
+            // خريطة لتحويل أسماء الأعمدة المختلفة إلى الأسماء المطلوبة
+            const columnMapping: { [key: string]: string } = {
+              'name': 'name',
+              'الاسم': 'name',
+              'اسم': 'name',
+              'phone': 'phone',
+              'الهاتف': 'phone',
+              'هاتف': 'phone',
+              'رقم الهاتف': 'phone',
+              'creditscore': 'creditScore',
+              'credit_score': 'creditScore',
+              'الدرجة الائتمانية': 'creditScore',
+              'درجة ائتمانية': 'creditScore',
+              'paymentcommitment': 'paymentCommitment',
+              'payment_commitment': 'paymentCommitment',
+              'التزام الدفع': 'paymentCommitment',
+              'التزام دفع': 'paymentCommitment',
+              'hagglinglevel': 'hagglingLevel',
+              'haggling_level': 'hagglingLevel',
+              'مستوى المساومة': 'hagglingLevel',
+              'مساومة': 'hagglingLevel',
+              'purchasewillingness': 'purchaseWillingness',
+              'purchase_willingness': 'purchaseWillingness',
+              'الرغبة في الشراء': 'purchaseWillingness',
+              'استعداد الشراء': 'purchaseWillingness',
+              'lastpayment': 'lastPayment',
+              'last_payment': 'lastPayment',
+              'آخر دفعة': 'lastPayment',
+              'اخر دفعة': 'lastPayment',
+              'totaldebt': 'totalDebt',
+              'total_debt': 'totalDebt',
+              'إجمالي الدين': 'totalDebt',
+              'اجمالي الدين': 'totalDebt',
+              'الدين': 'totalDebt',
+                const customer = {
+              'الحالة': 'status',
+              'حالة': 'status'
+            };
+
             headers.forEach((header, index) => {
               const value = row[index];
+                  lastPayment: convertDateFormat(parts[6]),
               
               // تحويل الأرقام
-              if (['creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'totalDebt'].includes(header)) {
-                customer[header] = parseFloat(value) || 0;
-              } else if (header === 'lastPayment') {
-                customer[header] = convertDateFormat(value?.toString() || '');
+              if (['creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'totalDebt'].includes(mappedField)) {
+                customer[mappedField] = parseFloat(value) || 0;
+                // تحديد الحالة تلقائياً إذا لم تكن صحيحة
+                if (!['excellent', 'good', 'fair', 'poor'].includes(customer.status)) {
+                  if (customer.creditScore >= 750) customer.status = 'excellent';
+                  else if (customer.creditScore >= 700) customer.status = 'good';
+                  else if (customer.creditScore >= 600) customer.status = 'fair';
+                  else customer.status = 'poor';
+                }
               } else {
-                customer[header] = value?.toString() || '';
+                customers.push(customer as CustomerData);
               }
             });
             
+            // التأكد من وجود جميع الحقول المطلوبة مع قيم افتراضية
+            const requiredFields = {
+              name: customer.name || '',
+              phone: customer.phone || '',
+              creditScore: customer.creditScore || 650,
+              paymentCommitment: customer.paymentCommitment || 75,
+              hagglingLevel: customer.hagglingLevel || 5,
+              purchaseWillingness: customer.purchaseWillingness || 7,
+              lastPayment: customer.lastPayment || '',
+              totalDebt: customer.totalDebt || 0,
+              status: customer.status || 'fair'
+            };
+
             // تحديد الحالة تلقائياً إذا لم تكن موجودة
-            if (!customer.status) {
-              if (customer.creditScore >= 750) customer.status = 'excellent';
-              else if (customer.creditScore >= 700) customer.status = 'good';
-              else if (customer.creditScore >= 600) customer.status = 'fair';
-              else customer.status = 'poor';
+            if (!requiredFields.status || !['excellent', 'good', 'fair', 'poor'].includes(requiredFields.status)) {
+              if (requiredFields.creditScore >= 750) requiredFields.status = 'excellent';
+              else if (requiredFields.creditScore >= 700) requiredFields.status = 'good';
+              else if (requiredFields.creditScore >= 600) requiredFields.status = 'fair';
+              else requiredFields.status = 'poor';
             }
             
-            customers.push(customer);
+            customers.push(requiredFields as CustomerData);
           }
           
           resolve(customers);
