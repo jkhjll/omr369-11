@@ -159,7 +159,7 @@ export const useCustomers = () => {
   };
 
   // إضافة عملاء متعددين (للاستيراد)
-  const addMultipleCustomers = async (customersData: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<boolean> => {
+  const addMultipleCustomers = async (customersData: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<{ success: boolean; count: number }> => {
     try {
       const { data: session } = await supabase.auth.getSession();
       if (!session.session) {
@@ -185,10 +185,10 @@ export const useCustomers = () => {
       
       toast({
         title: "تم استيراد البيانات بنجاح",
-        description: `تم إضافة ${newCustomers.length} عميل إلى قاعدة البيانات`,
+        description: `تم إضافة ${newCustomers.length} عميل جديد إلى قاعدة البيانات`,
       });
 
-      return true;
+      return { success: true, count: newCustomers.length };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في استيراد البيانات';
       toast({
@@ -196,7 +196,7 @@ export const useCustomers = () => {
         description: errorMessage,
         variant: "destructive",
       });
-      return false;
+      return { success: false, count: 0 };
     }
   };
 

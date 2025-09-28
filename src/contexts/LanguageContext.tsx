@@ -296,6 +296,7 @@ const translations = {
     // Data Import
     'import.title': 'Import Data',
     'import.description': 'Upload an Excel or CSV file containing customer data',
+    'import.dragDrop': 'Drag and drop file here or click to select',
     'import.selectFile': 'Select File',
     'import.processing': 'Processing...',
     'import.import': 'Import',
@@ -305,6 +306,9 @@ const translations = {
     'import.noValidData': 'No valid data found in file',
     'import.processingError': 'Error processing file',
     'import.supportedColumns': 'Supported Columns',
+    'import.supportedFormats': 'Supported formats: Excel (.xlsx, .xls), CSV (.csv)',
+    'import.preview': 'Data Preview',
+    'import.rowsFound': 'rows found',
   }
 };
 

@@ -11,11 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Filter, Download, Users, Loader as Loader2 } from "lucide-react";
+import { Upload } from "lucide-react";
 import { useCustomers, CustomerData } from "@/hooks/useCustomers";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>("");
@@ -105,7 +107,12 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-2">
                 <AddCustomer onCustomerAdded={handleCustomerAdded} />
-                <DataImport onDataImported={handleDataImported} />
+                <DataImport onDataImported={handleDataImported}>
+                  <Button className="gradient-accent text-accent-foreground">
+                    <Upload className="h-4 w-4 ml-2" />
+                    {t('btn.importData')}
+                  </Button>
+                </DataImport>
                 <Button 
                   onClick={handleExportData}
                   disabled={customers.length === 0}

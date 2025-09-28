@@ -136,6 +136,7 @@ export const DataImport: React.FC<DataImportProps> = ({ onDataImported, children
         {children}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
@@ -146,6 +147,8 @@ export const DataImport: React.FC<DataImportProps> = ({ onDataImported, children
         <div className="space-y-4">
           <div className="text-sm text-muted-foreground">
             {t('import.description')}
+            <br />
+            <span className="text-xs">{t('import.supportedFormats')}</span>
           </div>
 
           <div className="space-y-2">
@@ -179,6 +182,45 @@ export const DataImport: React.FC<DataImportProps> = ({ onDataImported, children
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>{success}</AlertDescription>
             </Alert>
+          )}
+
+          {previewData.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">{t('import.preview')} ({previewData.length} {t('import.rowsFound')})</Label>
+              <div className="border rounded-lg overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>{t('field.name')}</TableHead>
+                      <TableHead>{t('field.phone')}</TableHead>
+                      <TableHead>{t('field.creditScore')}</TableHead>
+                      <TableHead>{t('field.status')}</TableHead>
+                      <TableHead>{t('field.totalDebt')}</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {previewData.map((customer, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{customer.name}</TableCell>
+                        <TableCell>{customer.phone}</TableCell>
+                        <TableCell>{customer.credit_score}</TableCell>
+                        <TableCell>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            customer.status === 'excellent' ? 'bg-green-100 text-green-800' :
+                            customer.status === 'good' ? 'bg-blue-100 text-blue-800' :
+                            customer.status === 'fair' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {t(`status.${customer.status}`)}
+                          </span>
+                        </TableCell>
+                        <TableCell>{customer.total_debt} {t('currency')}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           )}
 
           <div className="flex justify-end gap-2">
