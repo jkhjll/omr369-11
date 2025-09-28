@@ -10,6 +10,7 @@ import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircl
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 import * as XLSX from 'xlsx';
+import { parse, format, isValid } from 'date-fns';
 
 interface CustomerData {
   id?: string;
@@ -73,6 +74,30 @@ export function DataImport({ onDataImported }: DataImportProps) {
     return { isValid: errors.length === 0, errors };
   };
 
+  const convertDateFormat = (dateString: string): string => {
+    if (!dateString) return '';
+    
+    // Try parsing DD/MM/YYYY format first
+    let parsedDate = parse(dateString, 'dd/MM/yyyy', new Date());
+    
+    // If that fails, try other common formats
+    if (!isValid(parsedDate)) {
+      parsedDate = parse(dateString, 'MM/dd/yyyy', new Date());
+    }
+    
+    if (!isValid(parsedDate)) {
+      parsedDate = parse(dateString, 'yyyy-MM-dd', new Date());
+    }
+    
+    // If still invalid, try parsing as ISO string
+    if (!isValid(parsedDate)) {
+      parsedDate = new Date(dateString);
+    }
+    
+    // Return in YYYY-MM-DD format if valid, otherwise return empty string
+    return isValid(parsedDate) ? format(parsedDate, 'yyyy-MM-dd') : '';
+  };
+
   const processCSV = (csvText: string): CustomerData[] => {
     const lines = csvText.split('\n').filter(line => line.trim());
     const headers = lines[0].split(',').map(h => h.trim());
@@ -88,6 +113,8 @@ export function DataImport({ onDataImported }: DataImportProps) {
         // تحويل الأرقام
         if (['creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'totalDebt'].includes(header)) {
           customer[header] = parseFloat(value) || 0;
+        } else if (header === 'lastPayment') {
+          customer[header] = convertDateFormat(value);
         } else {
           customer[header] = value;
         }
@@ -137,6 +164,8 @@ export function DataImport({ onDataImported }: DataImportProps) {
               // تحويل الأرقام
               if (['creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'totalDebt'].includes(header)) {
                 customer[header] = parseFloat(value) || 0;
+              } else if (header === 'lastPayment') {
+                customer[header] = convertDateFormat(value?.toString() || '');
               } else {
                 customer[header] = value?.toString() || '';
               }
@@ -201,6 +230,10 @@ export function DataImport({ onDataImported }: DataImportProps) {
               totalDebt: parseFloat(parts[7]) || 0,
               status: parts[8] || 'fair'
             };
+            
+            // Convert date format
+            customer.lastPayment = convertDateFormat(customer.lastPayment);
+            
             customers.push(customer);
           }
         }
@@ -308,9 +341,9 @@ export function DataImport({ onDataImported }: DataImportProps) {
     // إنشاء نموذج Excel
     const templateData = [
       ['name', 'phone', 'creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'lastPayment', 'totalDebt', 'status'],
-      ['أحمد محمد علي', '01012345678', 785, 94, 6, 8, '15/12/2024', 12500, 'excellent'],
-      ['فاطمة أحمد محمود', '01098765432', 692, 87, 8, 9, '10/12/2024', 8900, 'good'],
-      ['محمد أحمد سعد', '01055567890', 620, 75, 7, 6, '08/12/2024', 15000, 'fair']
+      ['أحمد محمد علي', '01012345678', 785, 94, 6, 8, '2024-12-15', 12500, 'excellent'],
+      ['فاطمة أحمد محمود', '01098765432', 692, 87, 8, 9, '2024-12-10', 8900, 'good'],
+      ['محمد أحمد سعد', '01055567890', 620, 75, 7, 6, '2024-12-08', 15000, 'fair']
     ];
 
     const worksheet = XLSX.utils.aoa_to_sheet(templateData);
