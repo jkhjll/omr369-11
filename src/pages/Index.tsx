@@ -14,6 +14,7 @@ import { Search, Filter, Download, Users, Loader as Loader2 } from "lucide-react
 import { Upload } from "lucide-react";
 import { useCustomers, CustomerData } from "@/hooks/useCustomers";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const { t } = useLanguage();
