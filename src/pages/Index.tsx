@@ -58,10 +58,10 @@ const Index = () => {
 
     const csvContent = [
       // Headers
-      'customerCode,name,phone,creditScore,paymentCommitment,hagglingLevel,purchaseWillingness,lastPayment,totalDebt,status',
+      'customerCode,name,phone,creditScore,paymentCommitment,hagglingLevel,purchaseWillingness,lastPayment,totalDebt,installmentAmount,status',
       // Data rows
       ...customers.map(customer => 
-        `"${customer.customerCode}","${customer.name}","${customer.phone}",${customer.creditScore},${customer.paymentCommitment},${customer.hagglingLevel},${customer.purchaseWillingness},"${customer.lastPayment}",${customer.totalDebt},"${customer.status}"`
+        `"${customer.customerCode}","${customer.name}","${customer.phone}",${customer.creditScore},${customer.paymentCommitment},${customer.hagglingLevel},${customer.purchaseWillingness},"${customer.lastPayment}",${customer.totalDebt},${customer.installmentAmount},"${customer.status}"`
       )
     ].join('\n');
 

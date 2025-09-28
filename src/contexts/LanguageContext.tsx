@@ -66,6 +66,7 @@ const translations = {
     'field.purchaseWillingness': 'الرغبة في الشراء',
     'field.lastPayment': 'آخر دفعة',
     'field.totalDebt': 'إجمالي الدين',
+    'field.installmentAmount': 'مبلغ القسط',
     'field.status': 'الحالة',
 
     // Stats
@@ -199,6 +200,7 @@ const translations = {
     'field.purchaseWillingness': 'Purchase Willingness',
     'field.lastPayment': 'Last Payment',
     'field.totalDebt': 'Total Debt',
+    'field.installmentAmount': 'Installment Amount',
     'field.status': 'Status',
 
     // Stats

@@ -17,6 +17,7 @@ interface Customer {
   purchaseWillingness: number;
   lastPayment: string;
   totalDebt: number;
+  installmentAmount: number;
   status: 'excellent' | 'good' | 'fair' | 'poor';
 }
 
@@ -123,6 +124,12 @@ export function CustomerCard({ customer, onViewDetails, onDelete }: CustomerCard
             <span className="text-sm text-muted-foreground">{t('field.totalDebt')}</span>
             <span className="text-sm font-bold text-destructive">
               {customer.totalDebt.toLocaleString('ar-EG')} ج.م
+            </span>
+          </div>
+          <div className="flex justify-between items-center mt-2">
+            <span className="text-sm text-muted-foreground">مبلغ القسط</span>
+            <span className="text-sm font-medium text-primary">
+              {customer.installmentAmount.toLocaleString('ar-EG')} ج.م
             </span>
           </div>
         </div>

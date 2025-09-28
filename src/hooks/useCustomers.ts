@@ -13,6 +13,7 @@ export interface CustomerData {
   purchaseWillingness: number;
   lastPayment: string;
   totalDebt: number;
+  installmentAmount: number;
   status: 'excellent' | 'good' | 'fair' | 'poor';
   createdAt?: string;
   updatedAt?: string;
@@ -30,6 +31,7 @@ export interface DatabaseCustomer {
   purchase_willingness: number;
   last_payment: string | null;
   total_debt: number;
+  installment_amount: number;
   status: string;
   created_at: string;
   updated_at: string;
@@ -47,6 +49,7 @@ const transformFromDatabase = (dbCustomer: any): CustomerData => ({
   purchaseWillingness: dbCustomer.purchase_willingness,
   lastPayment: dbCustomer.last_payment || '',
   totalDebt: Number(dbCustomer.total_debt),
+  installmentAmount: Number(dbCustomer.installment_amount || 0),
   status: dbCustomer.status as CustomerData['status'],
   createdAt: dbCustomer.created_at,
   updatedAt: dbCustomer.updated_at,
@@ -63,6 +66,7 @@ const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | '
   purchase_willingness: customer.purchaseWillingness,
   last_payment: customer.lastPayment || null,
   total_debt: customer.totalDebt,
+  installment_amount: customer.installmentAmount,
   status: customer.status,
 });
 

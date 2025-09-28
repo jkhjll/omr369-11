@@ -21,6 +21,7 @@ interface CustomerData {
   purchaseWillingness: number;
   lastPayment: string;
   totalDebt: number;
+  installmentAmount: number;
   status: 'excellent' | 'good' | 'fair' | 'poor';
 }
 
@@ -31,8 +32,9 @@ interface AddCustomerProps {
 export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
+  const [isGeneratingCode, setIsGeneratingCode] = useState(false);
   const [formData, setFormData] = useState<CustomerData>({
-    customerCode: '',
+    customerCode: 'سيتم توليده تلقائياً',
     name: '',
     phone: '',
     creditScore: 650,
@@ -41,6 +43,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     purchaseWillingness: 7,
     lastPayment: '',
     totalDebt: 0,
+    installmentAmount: 0,
     status: 'fair'
   });
   const [errors, setErrors] = useState<Partial<Record<keyof CustomerData, string>>>({});
@@ -48,10 +51,6 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CustomerData, string>> = {};
-
-    if (!formData.customerCode.trim()) {
-      newErrors.customerCode = t('validation.customerCodeRequired') || 'Customer code is required';
-    }
 
     if (!formData.name.trim()) {
       newErrors.name = t('validation.nameRequired') || 'Customer name is required';
@@ -69,6 +68,10 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
     if (formData.totalDebt < 0) {
       newErrors.totalDebt = t('validation.debtNegative') || 'Total debt cannot be negative';
+    }
+
+    if (formData.installmentAmount < 0) {
+      newErrors.installmentAmount = 'مبلغ القسط لا يمكن أن يكون سالباً';
     }
 
     setErrors(newErrors);
@@ -108,6 +111,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
 
     const newCustomer = {
       ...formData,
+      customerCode: '', // سيتم توليده تلقائياً في قاعدة البيانات
       id: `customer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     };
 
@@ -115,7 +119,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     
     // إعادة تعيين النموذج
     setFormData({
-      customerCode: '',
+      customerCode: 'سيتم توليده تلقائياً',
       name: '',
       phone: '',
       creditScore: 650,
@@ -124,6 +128,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
       purchaseWillingness: 7,
       lastPayment: '',
       totalDebt: 0,
+      installmentAmount: 0,
       status: 'fair'
     });
     
@@ -180,12 +185,11 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
                 <Label htmlFor="customerCode">{t('field.customerCode')} *</Label>
                 <Input
                   id="customerCode"
-                  value={formData.customerCode}
-                  onChange={(e) => handleInputChange('customerCode', e.target.value)}
-                  placeholder={t('placeholder.customerCode') || 'e.g., C001'}
-                  className={errors.customerCode ? 'border-destructive' : ''}
+                  value="سيتم توليده تلقائياً"
+                  disabled={true}
+                  className="bg-muted text-muted-foreground"
                 />
-                {errors.customerCode && <p className="text-sm text-destructive mt-1">{errors.customerCode}</p>}
+                <p className="text-xs text-muted-foreground mt-1">سيتم توليد الكود تلقائياً بالتنسيق C-1, C-2, إلخ</p>
               </div>
 
               <div>
@@ -234,6 +238,20 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
                   className={errors.totalDebt ? 'border-destructive' : ''}
                 />
                 {errors.totalDebt && <p className="text-sm text-destructive mt-1">{errors.totalDebt}</p>}
+              </div>
+
+              <div>
+                <Label htmlFor="installmentAmount">مبلغ القسط ({t('currency') || 'EGP'})</Label>
+                <Input
+                  id="installmentAmount"
+                  type="number"
+                  min="0"
+                  value={formData.installmentAmount}
+                  onChange={(e) => handleInputChange('installmentAmount', parseFloat(e.target.value) || 0)}
+                  placeholder="0"
+                  className={errors.installmentAmount ? 'border-destructive' : ''}
+                />
+                {errors.installmentAmount && <p className="text-sm text-destructive mt-1">{errors.installmentAmount}</p>}
               </div>
             </div>
           </Card>
