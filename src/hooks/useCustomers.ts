@@ -56,17 +56,22 @@ const transformFromDatabase = (dbCustomer: any): CustomerData => ({
 });
 
 // تحويل من نموذج التطبيق إلى نموذج قاعدة البيانات
-const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>) => ({
-  name: customer.name,
-  phone: customer.phone,
-  credit_score: customer.creditScore,
-  payment_commitment: customer.paymentCommitment,
-  haggling_level: customer.hagglingLevel,
-  purchase_willingness: customer.purchaseWillingness,
-  last_payment: customer.lastPayment || null,
-  total_debt: customer.totalDebt,
-  status: customer.status,
-});
+const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>) => {
+  // Explicitly exclude client-side only fields (customerCode, installmentAmount)
+  const { customerCode, installmentAmount, ...dbFields } = customer;
+  
+  return {
+    name: dbFields.name,
+    phone: dbFields.phone,
+    credit_score: dbFields.creditScore,
+    payment_commitment: dbFields.paymentCommitment,
+    haggling_level: dbFields.hagglingLevel,
+    purchase_willingness: dbFields.purchaseWillingness,
+    last_payment: dbFields.lastPayment || null,
+    total_debt: dbFields.totalDebt,
+    status: dbFields.status,
+  };
+};
 
 export const useCustomers = () => {
   const [customers, setCustomers] = useState<CustomerData[]>([]);
