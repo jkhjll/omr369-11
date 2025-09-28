@@ -1,76 +1,82 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
-import { useToast } from './ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 import * as XLSX from 'xlsx';
+import { CustomerData } from '@/hooks/useCustomers';
 
-interface Customer {
+// واجهة بيانات العميل للاستيراد
+interface ImportCustomer {
   name: string;
   phone: string;
-  credit_score: number;
-  payment_commitment: number;
-  haggling_level: number;
-  purchase_willingness: number;
+  creditScore: number;
+  paymentCommitment: number;
+  hagglingLevel: number;
+  purchaseWillingness: number;
   status: 'excellent' | 'good' | 'fair' | 'poor';
-  total_debt?: number;
-  installment_amount?: number;
+  totalDebt?: number;
+  installmentAmount?: number;
 }
 
 interface DataImportProps {
-  onDataImported: (customers: Customer[]) => void;
+  onDataImported: (customers: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[]) => void;
 }
 
 export default function DataImport({ onDataImported }: DataImportProps) {
+  const { t } = useLanguage();
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [previewData, setPreviewData] = useState<Customer[]>([]);
+  const [previewData, setPreviewData] = useState<ImportCustomer[]>([]);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const validateCustomerData = (data: any[]): Customer[] => {
-    const validCustomers: Customer[] = [];
+  // دالة التحقق من صحة بيانات العملاء
+  const validateCustomerData = (data: any[]): Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[] => {
+    const validCustomers: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[] = [];
     const errors: string[] = [];
 
     data.forEach((row, index) => {
       try {
-        const customer: Customer = {
+        const customer: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'> = {
+          customerCode: `C-${Date.now()}-${index}`, // توليد كود مؤقت
           name: String(row.name || row.Name || '').trim(),
           phone: String(row.phone || row.Phone || '').trim(),
-          credit_score: Number(row.credit_score || row['Credit Score'] || 0),
-          payment_commitment: Number(row.payment_commitment || row['Payment Commitment'] || 0),
-          haggling_level: Number(row.haggling_level || row['Haggling Level'] || 1),
-          purchase_willingness: Number(row.purchase_willingness || row['Purchase Willingness'] || 1),
+          creditScore: Number(row.credit_score || row.creditScore || row['Credit Score'] || 0),
+          paymentCommitment: Number(row.payment_commitment || row.paymentCommitment || row['Payment Commitment'] || 0),
+          hagglingLevel: Number(row.haggling_level || row.hagglingLevel || row['Haggling Level'] || 1),
+          purchaseWillingness: Number(row.purchase_willingness || row.purchaseWillingness || row['Purchase Willingness'] || 1),
           status: (row.status || row.Status || 'fair').toLowerCase() as Customer['status'],
-          total_debt: Number(row.total_debt || row['Total Debt'] || 0),
-          installment_amount: Number(row.installment_amount || row['Installment Amount'] || 0),
+          lastPayment: String(row.last_payment || row.lastPayment || row['Last Payment'] || ''),
+          totalDebt: Number(row.total_debt || row.totalDebt || row['Total Debt'] || 0),
+          installmentAmount: Number(row.installment_amount || row.installmentAmount || row['Installment Amount'] || 0),
         };
 
-        // Validate required fields
+        // التحقق من الحقول المطلوبة
         if (!customer.name) {
-          errors.push(`Row ${index + 1}: Name is required`);
+          errors.push(`${t('import.missingData')} ${index + 1}: ${t('field.name')}`);
           return;
         }
         if (!customer.phone) {
-          errors.push(`Row ${index + 1}: Phone is required`);
+          errors.push(`${t('import.missingData')} ${index + 1}: ${t('field.phone')}`);
           return;
         }
-        if (customer.credit_score < 300 || customer.credit_score > 850) {
-          errors.push(`Row ${index + 1}: Credit score must be between 300-850`);
+        if (customer.creditScore < 300 || customer.creditScore > 850) {
+          errors.push(`${t('import.missingData')} ${index + 1}: ${t('validation.creditScoreRange')}`);
           return;
         }
-        if (customer.payment_commitment < 0 || customer.payment_commitment > 100) {
-          errors.push(`Row ${index + 1}: Payment commitment must be between 0-100`);
+        if (customer.paymentCommitment < 0 || customer.paymentCommitment > 100) {
+          errors.push(`${t('import.missingData')} ${index + 1}: Payment commitment must be between 0-100`);
           return;
         }
         if (!['excellent', 'good', 'fair', 'poor'].includes(customer.status)) {
-          customer.status = 'fair'; // Default fallback
+          customer.status = 'fair'; // قيمة افتراضية
         }
 
         validCustomers.push(customer);
       } catch (err) {
-        errors.push(`Row ${index + 1}: Invalid data format`);
+        errors.push(`${t('import.missingData')} ${index + 1}: Invalid data format`);
       }
     });
 
@@ -81,6 +87,7 @@ export default function DataImport({ onDataImported }: DataImportProps) {
     return validCustomers;
   };
 
+  // دالة معالجة الملف
   const processFile = useCallback(async (file: File) => {
     setIsProcessing(true);
     setError(null);
@@ -93,23 +100,23 @@ export default function DataImport({ onDataImported }: DataImportProps) {
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
       if (jsonData.length === 0) {
-        throw new Error('The file appears to be empty or has no valid data');
+        throw new Error(t('import.noValidData'));
       }
 
       const validatedCustomers = validateCustomerData(jsonData);
       setPreviewData(validatedCustomers.slice(0, 5)); // Show first 5 for preview
       
       toast({
-        title: "File processed successfully",
-        description: `Found ${validatedCustomers.length} valid customer records`,
+        title: t('import.success'),
+        description: `${validatedCustomers.length} ${t('import.customersImported')}`,
       });
 
       return validatedCustomers;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to process file';
+      const errorMessage = err instanceof Error ? err.message : t('import.processingError');
       setError(errorMessage);
       toast({
-        title: "Import failed",
+        title: t('import.processingError'),
         description: errorMessage,
         variant: "destructive",
       });
@@ -119,6 +126,7 @@ export default function DataImport({ onDataImported }: DataImportProps) {
     }
   }, [toast]);
 
+  // دالة اختيار الملف
   const handleFileSelect = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
@@ -130,7 +138,7 @@ export default function DataImport({ onDataImported }: DataImportProps) {
     ];
 
     if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/i)) {
-      setError('Please select a valid Excel (.xlsx, .xls) or CSV file');
+      setError(t('import.supportedFormats'));
       return;
     }
 
@@ -140,6 +148,7 @@ export default function DataImport({ onDataImported }: DataImportProps) {
     }
   }, [processFile, onDataImported]);
 
+  // دوال السحب والإفلات
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -157,18 +166,8 @@ export default function DataImport({ onDataImported }: DataImportProps) {
   }, [handleFileSelect]);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Upload className="h-5 w-5" />
-          Import Customer Data
-        </CardTitle>
-        <CardDescription>
-          Upload an Excel or CSV file containing customer information
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div
+    <div className="space-y-4">
+      <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
             isDragging
               ? 'border-primary bg-primary/5'
@@ -180,10 +179,10 @@ export default function DataImport({ onDataImported }: DataImportProps) {
         >
           <FileText className="h-12 w-12 mx-auto mb-4 text-gray-400" />
           <p className="text-lg font-medium mb-2">
-            {isDragging ? 'Drop your file here' : 'Drag and drop your file here'}
+            {isDragging ? t('import.dropFile') : t('import.dragDrop')}
           </p>
           <p className="text-sm text-gray-500 mb-4">
-            Supports Excel (.xlsx, .xls) and CSV files
+            {t('import.supportedFormats')}
           </p>
           <Button
             variant="outline"
@@ -199,7 +198,7 @@ export default function DataImport({ onDataImported }: DataImportProps) {
             }}
             disabled={isProcessing}
           >
-            {isProcessing ? 'Processing...' : 'Choose File'}
+            {isProcessing ? t('import.processing') : t('import.selectFile')}
           </Button>
         </div>
 
@@ -214,11 +213,11 @@ export default function DataImport({ onDataImported }: DataImportProps) {
           <Alert>
             <CheckCircle className="h-4 w-4" />
             <AlertDescription>
-              Preview of imported data (showing first 5 records):
+              {t('import.preview')} ({previewData.length} {t('import.rowsFound')}):
               <div className="mt-2 text-xs">
                 {previewData.map((customer, index) => (
                   <div key={index} className="py-1">
-                    {customer.name} - {customer.phone} (Score: {customer.credit_score})
+                    {customer.name} - {customer.phone} (Score: {customer.creditScore})
                   </div>
                 ))}
               </div>
@@ -227,11 +226,10 @@ export default function DataImport({ onDataImported }: DataImportProps) {
         )}
 
         <div className="text-xs text-gray-500 space-y-1">
-          <p><strong>Required columns:</strong> name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, status</p>
-          <p><strong>Optional columns:</strong> total_debt, installment_amount</p>
+          <p><strong>{t('import.supportedColumns')}:</strong> name, phone, creditScore, paymentCommitment, hagglingLevel, purchaseWillingness, status</p>
+          <p><strong>Optional columns:</strong> totalDebt, installmentAmount, lastPayment</p>
           <p><strong>Status values:</strong> excellent, good, fair, poor</p>
         </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

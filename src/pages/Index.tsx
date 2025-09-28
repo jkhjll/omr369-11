@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Search, Filter, Download, Users, Loader as Loader2 } from "lucide-react";
 import { Upload } from "lucide-react";
 import { useCustomers, CustomerData } from "@/hooks/useCustomers";
@@ -20,6 +21,7 @@ const Index = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>("");
   const { 
@@ -44,8 +46,12 @@ const Index = () => {
     setSelectedCustomerName(customer?.name || "");
   };
 
-  const handleDataImported = async (importedData: (CustomerData & { id: string })[]) => {
-    const customersData = importedData.map(({ id, ...customer }) => customer);
+  // دالة معالجة استيراد البيانات مع إغلاق النافذة المنبثقة عند النجاح
+  const handleDataImported = async (importedData: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+    const result = await addMultipleCustomers(importedData);
+    if (result.success) {
+      setIsImportDialogOpen(false); // إغلاق النافذة المنبثقة عند نجاح الاستيراد
+    }
     await addMultipleCustomers(customersData);
   };
 
@@ -108,12 +114,20 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-2">
                 <AddCustomer onCustomerAdded={handleCustomerAdded} />
-                <DataImport onDataImported={handleDataImported}>
-                  <Button className="gradient-accent text-accent-foreground">
-                    <Upload className="h-4 w-4 ml-2" />
-                    {t('btn.importData')}
-                  </Button>
-                </DataImport>
+                <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="gradient-accent text-accent-foreground">
+                      <Upload className="h-4 w-4 ml-2" />
+                      {t('btn.importData')}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>{t('import.title')}</DialogTitle>
+                    </DialogHeader>
+                    <DataImport onDataImported={handleDataImported} />
+                  </DialogContent>
+                </Dialog>
                 <Button 
                   onClick={handleExportData}
                   disabled={customers.length === 0}

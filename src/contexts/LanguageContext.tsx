@@ -149,6 +149,7 @@ const translations = {
     // Data Import
     'import.title': 'استيراد البيانات',
     'import.description': 'قم بتحميل ملف Excel أو CSV يحتوي على بيانات العملاء',
+    'import.dragDrop': 'اسحب وأفلت الملف هنا أو انقر للاختيار',
     'import.selectFile': 'اختر الملف',
     'import.processing': 'جاري المعالجة...',
     'import.import': 'استيراد',
@@ -158,6 +159,10 @@ const translations = {
     'import.noValidData': 'لا توجد بيانات صالحة في الملف',
     'import.processingError': 'خطأ في معالجة الملف',
     'import.supportedColumns': 'الأعمدة المدعومة',
+    'import.supportedFormats': 'الصيغ المدعومة: Excel (.xlsx, .xls), CSV (.csv)',
+    'import.preview': 'معاينة البيانات',
+    'import.rowsFound': 'صف موجود',
+    'import.dropFile': 'أفلت الملف هنا',
   },
   en: {
     // Header
@@ -297,6 +302,7 @@ const translations = {
     'import.title': 'Import Data',
     'import.description': 'Upload an Excel or CSV file containing customer data',
     'import.dragDrop': 'Drag and drop file here or click to select',
+    'import.dragDrop': 'Drag and drop file here or click to select',
     'import.selectFile': 'Select File',
     'import.processing': 'Processing...',
     'import.import': 'Import',
@@ -306,6 +312,10 @@ const translations = {
     'import.noValidData': 'No valid data found in file',
     'import.processingError': 'Error processing file',
     'import.supportedColumns': 'Supported Columns',
+    'import.supportedFormats': 'Supported formats: Excel (.xlsx, .xls), CSV (.csv)',
+    'import.preview': 'Data Preview',
+    'import.rowsFound': 'rows found',
+    'import.dropFile': 'Drop your file here',
     'import.supportedFormats': 'Supported formats: Excel (.xlsx, .xls), CSV (.csv)',
     'import.preview': 'Data Preview',
     'import.rowsFound': 'rows found',
