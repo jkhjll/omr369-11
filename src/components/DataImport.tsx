@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import * as XLSX from 'xlsx';
 
 interface CustomerData {
@@ -36,6 +37,7 @@ export function DataImport({ onDataImported }: DataImportProps) {
   const [showPreview, setShowPreview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const validateCustomerData = (data: any): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
