@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { User } from '@supabase/supabase-js';
 
 export interface PaymentRecord {
   id: string;
@@ -58,6 +59,7 @@ export const usePaymentRecords = (customerId?: string) => {
   const [paymentRecords, setPaymentRecords] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
   // جلب سجلات الدفع من قاعدة البيانات
@@ -66,15 +68,24 @@ export const usePaymentRecords = (customerId?: string) => {
       setLoading(true);
       setError(null);
 
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
         setPaymentRecords([]);
+        setUser(null);
         return;
       }
+
+      setUser(session.user);
 
       let query = supabase
         .from('payment_records')
         .select('*')
+        .eq('user_id', session.user.id)
         .order('due_date', { ascending: false });
 
       if (customerId) {
@@ -105,8 +116,13 @@ export const usePaymentRecords = (customerId?: string) => {
   // إضافة سجل دفع جديد
   const addPaymentRecord = async (recordData: Omit<PaymentRecord, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
         throw new Error('يجب تسجيل الدخول أولاً');
       }
 
@@ -148,12 +164,23 @@ export const usePaymentRecords = (customerId?: string) => {
   // تحديث سجل دفع
   const updatePaymentRecord = async (id: string, recordData: Partial<Omit<PaymentRecord, 'id' | 'createdAt' | 'updatedAt'>>): Promise<boolean> => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
+        throw new Error('يجب تسجيل الدخول أولاً');
+      }
+
       const dbUpdate = transformToDatabase(recordData as any);
       
       const { data, error } = await supabase
         .from('payment_records')
         .update(dbUpdate)
         .eq('id', id)
+        .eq('user_id', session.user.id)
         .select()
         .single();
 
@@ -186,10 +213,21 @@ export const usePaymentRecords = (customerId?: string) => {
   // حذف سجل دفع
   const deletePaymentRecord = async (id: string): Promise<boolean> => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
+        throw new Error('يجب تسجيل الدخول أولاً');
+      }
+
       const { error } = await supabase
         .from('payment_records')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', session.user.id);
 
       if (error) {
         throw error;
@@ -224,7 +262,9 @@ export const usePaymentRecords = (customerId?: string) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         setPaymentRecords([]);
+        setUser(null);
       } else if (event === 'SIGNED_IN' && session) {
+        setUser(session.user);
         fetchPaymentRecords();
       }
     });
@@ -236,6 +276,7 @@ export const usePaymentRecords = (customerId?: string) => {
     paymentRecords,
     loading,
     error,
+    user,
     addPaymentRecord,
     updatePaymentRecord,
     deletePaymentRecord,

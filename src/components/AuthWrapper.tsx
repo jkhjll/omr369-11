@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -26,17 +26,31 @@ export function AuthWrapper({
   const {
     toast
   } = useToast();
+
   useEffect(() => {
     // جلب المستخدم الحالي
     const getUser = async () => {
-      const {
-        data: {
-          session
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('خطأ في جلب الجلسة:', error);
+          toast({
+            title: "خطأ في المصادقة",
+            description: "حدث خطأ في التحقق من حالة تسجيل الدخول",
+            variant: "destructive"
+          });
         }
-      } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-      setLoading(false);
+        
+        setUser(session?.user || null);
+      } catch (error) {
+        console.error('خطأ غير متوقع:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
     };
+    
     getUser();
 
     // الاستماع لتغييرات حالة المصادقة
@@ -44,35 +58,55 @@ export function AuthWrapper({
       data: {
         subscription
       }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth state changed:', event, session?.user?.id);
+      
+      if (event === 'SIGNED_IN') {
+        setUser(session?.user || null);
+        toast({
+          title: "تم تسجيل الدخول بنجاح",
+          description: "مرحباً بك في نظام سلوك العملاء"
+        });
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+      } else if (event === 'TOKEN_REFRESHED') {
+        setUser(session?.user || null);
+      }
+      
       setLoading(false);
     });
+    
     return () => subscription.unsubscribe();
   }, []);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
+    
     try {
       const {
+        data,
         error
       } = await supabase.auth.signInWithPassword({
         email,
         password
       });
+      
       if (error) {
+        console.error('خطأ في تسجيل الدخول:', error);
         toast({
           title: "خطأ في تسجيل الدخول",
-          description: `${error.message}. يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى.`,
+          description: getErrorMessage(error.message),
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "تم تسجيل الدخول بنجاح",
-          description: "مرحباً بك في نظام سلوك العملاء"
-        });
+        return;
       }
+      
+      // تسجيل الدخول نجح - سيتم التعامل معه في onAuthStateChange
+      console.log('تم تسجيل الدخول بنجاح:', data.user?.id);
+      
     } catch (error) {
+      console.error('خطأ غير متوقع في تسجيل الدخول:', error);
       toast({
         title: "خطأ",
         description: "حدث خطأ غير متوقع",
@@ -82,11 +116,14 @@ export function AuthWrapper({
       setAuthLoading(false);
     }
   };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true);
+    
     try {
       const {
+        data,
         error
       } = await supabase.auth.signUp({
         email,
@@ -95,19 +132,29 @@ export function AuthWrapper({
           emailRedirectTo: window.location.origin
         }
       });
+      
       if (error) {
+        console.error('خطأ في إنشاء الحساب:', error);
         toast({
           title: "خطأ في إنشاء الحساب",
-          description: `${error.message}. يرجى التحقق من البريد الإلكتروني وكلمة المرور والمحاولة مرة أخرى.`,
+          description: getErrorMessage(error.message),
           variant: "destructive"
         });
-      } else {
+        return;
+      }
+      
+      if (data.user && !data.session) {
         toast({
           title: "تم إنشاء الحساب",
-          description: "يرجى فحص بريدك الإلكتروني لتأكيد الحساب"
+          description: "تم إنشاء الحساب بنجاح. يمكنك الآن تسجيل الدخول."
         });
+      } else if (data.session) {
+        // تم تسجيل الدخول تلقائياً
+        console.log('تم إنشاء الحساب وتسجيل الدخول:', data.user?.id);
       }
+      
     } catch (error) {
+      console.error('خطأ غير متوقع في إنشاء الحساب:', error);
       toast({
         title: "خطأ",
         description: "حدث خطأ غير متوقع",
@@ -117,6 +164,30 @@ export function AuthWrapper({
       setAuthLoading(false);
     }
   };
+
+  // دالة لترجمة رسائل الخطأ
+  const getErrorMessage = (errorMessage: string): string => {
+    const errorMap: { [key: string]: string } = {
+      'Invalid login credentials': 'بيانات تسجيل الدخول غير صحيحة. يرجى التحقق من البريد الإلكتروني وكلمة المرور.',
+      'Email not confirmed': 'لم يتم تأكيد البريد الإلكتروني. يرجى فحص بريدك الإلكتروني.',
+      'User already registered': 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد إلكتروني آخر.',
+      'Password should be at least 6 characters': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
+      'Unable to validate email address: invalid format': 'تنسيق البريد الإلكتروني غير صحيح.',
+      'Network request failed': 'فشل في الاتصال بالشبكة. يرجى التحقق من اتصال الإنترنت.',
+      'Too many requests': 'تم إرسال طلبات كثيرة. يرجى المحاولة مرة أخرى بعد قليل.'
+    };
+
+    // البحث عن رسالة مطابقة
+    for (const [englishMsg, arabicMsg] of Object.entries(errorMap)) {
+      if (errorMessage.includes(englishMsg)) {
+        return arabicMsg;
+      }
+    }
+
+    // إذا لم توجد رسالة مطابقة، إرجاع رسالة عامة
+    return `خطأ: ${errorMessage}. يرجى المحاولة مرة أخرى.`;
+  };
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-gradient-surface">
         <div className="text-center">

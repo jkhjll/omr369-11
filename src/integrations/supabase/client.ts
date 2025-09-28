@@ -10,8 +10,29 @@ const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 
 export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
   auth: {
-    storage: localStorage,
+    storage: typeof window !== 'undefined' ? localStorage : undefined,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  global: {
+    headers: {
+      'X-Client-Info': 'customer-analytics-system'
+    }
+  },
+  db: {
+    schema: 'public'
+  }
+});
+
+// إضافة معالج للأخطاء العامة
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    console.log('تم تسجيل الخروج');
+  } else if (event === 'SIGNED_IN') {
+    console.log('تم تسجيل الدخول:', session?.user?.id);
+  } else if (event === 'TOKEN_REFRESHED') {
+    console.log('تم تحديث الرمز المميز');
   }
 });

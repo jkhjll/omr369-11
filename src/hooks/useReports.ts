@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { User } from '@supabase/supabase-js';
 
 export interface Report {
   id: string;
@@ -50,6 +51,7 @@ export const useReports = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
   // جلب التقارير من قاعدة البيانات
@@ -58,15 +60,24 @@ export const useReports = () => {
       setLoading(true);
       setError(null);
 
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
         setReports([]);
+        setUser(null);
         return;
       }
+
+      setUser(session.user);
 
       const { data, error: fetchError } = await supabase
         .from('reports')
         .select('*')
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -91,8 +102,13 @@ export const useReports = () => {
   // إضافة تقرير جديد
   const addReport = async (reportData: Omit<Report, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
         throw new Error('يجب تسجيل الدخول أولاً');
       }
 
@@ -134,12 +150,23 @@ export const useReports = () => {
   // تحديث تقرير
   const updateReport = async (id: string, reportData: Partial<Omit<Report, 'id' | 'createdAt' | 'updatedAt'>>): Promise<boolean> => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
+        throw new Error('يجب تسجيل الدخول أولاً');
+      }
+
       const dbUpdate = transformToDatabase(reportData as any);
       
       const { data, error } = await supabase
         .from('reports')
         .update(dbUpdate)
         .eq('id', id)
+        .eq('user_id', session.user.id)
         .select()
         .single();
 
@@ -172,10 +199,21 @@ export const useReports = () => {
   // حذف تقرير
   const deleteReport = async (id: string): Promise<boolean> => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
+        throw new Error('يجب تسجيل الدخول أولاً');
+      }
+
       const { error } = await supabase
         .from('reports')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', session.user.id);
 
       if (error) {
         throw error;
@@ -257,7 +295,9 @@ export const useReports = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         setReports([]);
+        setUser(null);
       } else if (event === 'SIGNED_IN' && session) {
+        setUser(session.user);
         fetchReports();
       }
     });
@@ -269,6 +309,7 @@ export const useReports = () => {
     reports,
     loading,
     error,
+    user,
     addReport,
     updateReport,
     deleteReport,

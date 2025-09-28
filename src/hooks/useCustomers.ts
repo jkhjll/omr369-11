@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { User } from '@supabase/supabase-js';
 
 export interface CustomerData {
   id: string;
@@ -75,6 +76,7 @@ export const useCustomers = () => {
   const [customers, setCustomers] = useState<CustomerData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
   // جلب العملاء من قاعدة البيانات
@@ -83,15 +85,25 @@ export const useCustomers = () => {
       setLoading(true);
       setError(null);
 
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      // التحقق من حالة المصادقة
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
         setCustomers([]);
+        setUser(null);
         return;
       }
 
+      setUser(session.user);
+
       const { data, error: fetchError } = await supabase
         .from('customers')
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
+        .select('*')
+        .eq('user_id', session.user.id)
         .order('created_at', { ascending: false });
 
       if (fetchError) {
@@ -116,8 +128,13 @@ export const useCustomers = () => {
   // إضافة عميل جديد
   const addCustomer = async (customerData: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> => {
     try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
         throw new Error('يجب تسجيل الدخول أولاً');
       }
 
@@ -138,7 +155,7 @@ export const useCustomers = () => {
       const { data, error } = await supabase
         .from('customers')
         .insert([insertPayload])
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
+        .select('*')
         .single();
 
       if (error) {
@@ -169,13 +186,24 @@ export const useCustomers = () => {
   // تحديث عميل
   const updateCustomer = async (id: string, customerData: Partial<Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>>): Promise<boolean> => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
+        throw new Error('يجب تسجيل الدخول أولاً');
+      }
+
       const dbUpdate = transformToDatabase(customerData as any);
       
       const { data, error } = await supabase
         .from('customers')
         .update(dbUpdate)
         .eq('id', id)
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
+        .eq('user_id', session.user.id)
+        .select('*')
         .single();
 
       if (error) {
@@ -207,10 +235,21 @@ export const useCustomers = () => {
   // حذف عميل
   const deleteCustomer = async (id: string): Promise<boolean> => {
     try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw new Error(`خطأ في جلسة المصادقة: ${sessionError.message}`);
+      }
+      
+      if (!session?.user) {
+        throw new Error('يجب تسجيل الدخول أولاً');
+      }
+
       const { error } = await supabase
         .from('customers')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', session.user.id);
 
       if (error) {
         throw error;
@@ -245,7 +284,9 @@ export const useCustomers = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
         setCustomers([]);
+        setUser(null);
       } else if (event === 'SIGNED_IN' && session) {
+        setUser(session.user);
         fetchCustomers();
       }
     });
@@ -257,6 +298,7 @@ export const useCustomers = () => {
     customers,
     loading,
     error,
+    user,
     addCustomer,
     updateCustomer,
     deleteCustomer,

@@ -30,9 +30,9 @@ const Index = () => {
   } = useCustomers();
 
   const filteredCustomers = customers.filter(customer =>
-    customer.name.includes(searchTerm) || 
-    customer.phone.includes(searchTerm) || 
-    customer.customerCode.includes(searchTerm)
+    customer.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    customer.phone.includes(searchTerm) ||
+    customer.customerCode.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleViewCustomerDetails = (customerId: string) => {
@@ -42,8 +42,16 @@ const Index = () => {
   };
 
   const handleCustomerAdded = async (newCustomer: CustomerData & { id: string }) => {
-    const { id, ...customerData } = newCustomer;
-    await addCustomer(customerData);
+    try {
+      const { id, ...customerData } = newCustomer;
+      const success = await addCustomer(customerData);
+      
+      if (!success) {
+        throw new Error('فشل في إضافة العميل');
+      }
+    } catch (error) {
+      throw error; // إعادة رمي الخطأ ليتم التعامل معه في AddCustomer
+    }
   };
 
   const handleExportData = () => {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -99,7 +99,7 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
       toast({
         title: t('toast.dataError') || "Data Error",
@@ -109,15 +109,44 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
       return;
     }
 
-    const newCustomer = {
+    const newCustomer: CustomerData & { id: string } = {
       ...formData,
       customerCode: '', // سيتم توليده تلقائياً في قاعدة البيانات
       id: `customer-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     };
 
-    onCustomerAdded(newCustomer);
+    try {
+      await onCustomerAdded(newCustomer);
+      
+      // إعادة تعيين النموذج فقط في حالة النجاح
+      setFormData({
+        customerCode: 'سيتم توليده تلقائياً',
+        name: '',
+        phone: '',
+        creditScore: 650,
+        paymentCommitment: 75,
+        hagglingLevel: 5,
+        purchaseWillingness: 7,
+        lastPayment: '',
+        totalDebt: 0,
+        installmentAmount: 0,
+        status: 'fair'
+      });
+      
+      setIsOpen(false);
+      setErrors({});
+      
+    } catch (error) {
+      console.error('خطأ في إضافة العميل:', error);
+      // لا نقوم بإعادة تعيين النموذج في حالة الخطأ
+    }
+  }, [formData, validateForm, onCustomerAdded, toast, t]);
     
-    // إعادة تعيين النموذج
+
+  const handleCancel = () => {
+    setIsOpen(false);
+    setErrors({});
+    // إعادة تعيين النموذج عند الإلغاء
     setFormData({
       customerCode: 'سيتم توليده تلقائياً',
       name: '',
@@ -131,18 +160,6 @@ export function AddCustomer({ onCustomerAdded }: AddCustomerProps) {
       installmentAmount: 0,
       status: 'fair'
     });
-    
-    setIsOpen(false);
-    
-    toast({
-      title: t('toast.customerAdded') || "Customer Added Successfully",
-      description: t('toast.customerAddedDesc')?.replace('{name}', newCustomer.name) || `${newCustomer.name} has been added to the database`,
-    });
-  };
-
-  const handleCancel = () => {
-    setIsOpen(false);
-    setErrors({});
   };
 
   const getStatusColor = (status: CustomerData['status']) => {
