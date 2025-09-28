@@ -12,6 +12,7 @@ import { useReports, Report } from "@/hooks/useReports";
 import { useCustomers } from "@/hooks/useCustomers";
 import { usePaymentRecords } from "@/hooks/usePaymentRecords";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function ReportsSection() {
   const { reports, loading, addReport, deleteReport, generateCustomerAnalysisReport, generatePaymentAnalysisReport } = useReports();

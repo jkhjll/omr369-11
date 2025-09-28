@@ -6,9 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calculator, TrendingUp, AlertTriangle, CheckCircle, Save } from "lucide-react";
+import { Calculator, TrendingUp, TriangleAlert as AlertTriangle, CircleCheck as CheckCircle, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Customer {
   id: string;
