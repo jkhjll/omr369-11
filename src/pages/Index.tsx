@@ -121,9 +121,9 @@ const Index = () => {
                       {t('btn.importData')}
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-2xl">
+                  <DialogContent className="max-w-2xl [&>button]:left-4 [&>button]:right-auto">
                     <DialogHeader>
-                      <DialogTitle>{t('import.title')}</DialogTitle>
+                      <DialogTitle className="text-right">{t('import.title')}</DialogTitle>
                     </DialogHeader>
                     <DataImport onDataImported={handleDataImported} />
                   </DialogContent>

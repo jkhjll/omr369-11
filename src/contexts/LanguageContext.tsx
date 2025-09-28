@@ -150,6 +150,7 @@ const translations = {
     'import.title': 'استيراد البيانات',
     'import.description': 'قم بتحميل ملف Excel أو CSV يحتوي على بيانات العملاء',
     'import.dragDrop': 'اسحب وأفلت الملف هنا أو انقر للاختيار',
+    'import.dropFile': 'أفلت الملف هنا',
     'import.selectFile': 'اختر الملف',
     'import.processing': 'جاري المعالجة...',
     'import.import': 'استيراد',
@@ -159,10 +160,19 @@ const translations = {
     'import.noValidData': 'لا توجد بيانات صالحة في الملف',
     'import.processingError': 'خطأ في معالجة الملف',
     'import.supportedColumns': 'الأعمدة المدعومة',
-    'import.supportedFormats': 'الصيغ المدعومة: Excel (.xlsx, .xls), CSV (.csv)',
+    'import.supportedFormats': 'الصيغ المدعومة: Excel (.xlsx, .xls), CSV (.csv), Word (.docx, .doc), PDF (.pdf)',
     'import.preview': 'معاينة البيانات',
     'import.rowsFound': 'صف موجود',
-    'import.dropFile': 'أفلت الملف هنا',
+    'import.optionalColumns': 'الأعمدة الاختيارية',
+    'import.statusValues': 'قيم الحالة',
+    'import.unsupportedStructuredData': 'لا يمكن استخراج البيانات المنظمة تلقائيًا من ملفات Word أو PDF. يرجى استخدام Excel أو CSV لاستيراد البيانات المنظمة.',
+    'import.downloadTemplate': 'تحميل نموذج',
+    
+    // Template buttons
+    'btn.idealFile': 'الملف المثالي',
+    'btn.idealWord': 'ملف Word مثالي',
+    'btn.idealExcel': 'ملف Excel مثالي',
+    'btn.idealCsv': 'ملف CSV مثالي',
   },
   en: {
     // Header
@@ -302,7 +312,7 @@ const translations = {
     'import.title': 'Import Data',
     'import.description': 'Upload an Excel or CSV file containing customer data',
     'import.dragDrop': 'Drag and drop file here or click to select',
-    'import.dragDrop': 'Drag and drop file here or click to select',
+    'import.dropFile': 'Drop your file here',
     'import.selectFile': 'Select File',
     'import.processing': 'Processing...',
     'import.import': 'Import',
@@ -312,13 +322,19 @@ const translations = {
     'import.noValidData': 'No valid data found in file',
     'import.processingError': 'Error processing file',
     'import.supportedColumns': 'Supported Columns',
-    'import.supportedFormats': 'Supported formats: Excel (.xlsx, .xls), CSV (.csv)',
+    'import.supportedFormats': 'Supported formats: Excel (.xlsx, .xls), CSV (.csv), Word (.docx, .doc), PDF (.pdf)',
     'import.preview': 'Data Preview',
     'import.rowsFound': 'rows found',
-    'import.dropFile': 'Drop your file here',
-    'import.supportedFormats': 'Supported formats: Excel (.xlsx, .xls), CSV (.csv)',
-    'import.preview': 'Data Preview',
-    'import.rowsFound': 'rows found',
+    'import.optionalColumns': 'Optional columns',
+    'import.statusValues': 'Status values',
+    'import.unsupportedStructuredData': 'Structured data cannot be automatically extracted from Word or PDF files. Please use Excel or CSV for structured data import.',
+    'import.downloadTemplate': 'Download Template',
+    
+    // Template buttons
+    'btn.idealFile': 'Ideal File',
+    'btn.idealWord': 'Ideal Word File',
+    'btn.idealExcel': 'Ideal Excel File',
+    'btn.idealCsv': 'Ideal CSV File',
   }
 };
 

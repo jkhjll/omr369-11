@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
-import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle } from 'lucide-react';
+import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Download } from 'lucide-react';
 import { Button } from './ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 import { Alert, AlertDescription } from './ui/alert';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -131,13 +132,29 @@ export default function DataImport({ onDataImported }: DataImportProps) {
     if (!files || files.length === 0) return;
 
     const file = files[0];
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    
+    // التحقق من أنواع الملفات الجديدة
+    if (fileExtension === 'docx' || fileExtension === 'doc' || fileExtension === 'pdf') {
+      setError(t('import.unsupportedStructuredData'));
+      toast({
+        title: t('import.processingError'),
+        description: t('import.unsupportedStructuredData'),
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const validTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
-      'text/csv'
+      'text/csv',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/msword',
+      'application/pdf'
     ];
 
-    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv)$/i)) {
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls|csv|docx|doc|pdf)$/i)) {
       setError(t('import.supportedFormats'));
       return;
     }
@@ -165,8 +182,158 @@ export default function DataImport({ onDataImported }: DataImportProps) {
     handleFileSelect(e.dataTransfer.files);
   }, [handleFileSelect]);
 
+  // دالة تحميل الملفات المثالية
+  const handleDownloadTemplate = useCallback((type: 'word' | 'excel' | 'csv') => {
+    let content = '';
+    let fileName = '';
+    let mimeType = '';
+    
+    const headers = 'name,phone,creditScore,paymentCommitment,hagglingLevel,purchaseWillingness,status,totalDebt,installmentAmount,lastPayment';
+    const sampleData = 'أحمد محمد,01012345678,750,85,3,8,excellent,5000,500,2024-01-15';
+    
+    switch (type) {
+      case 'csv':
+        content = `${headers}\n${sampleData}\nفاطمة علي,01098765432,680,75,5,7,good,3000,300,2024-01-10`;
+        fileName = 'نموذج_بيانات_العملاء.csv';
+        mimeType = 'text/csv;charset=utf-8;';
+        break;
+      case 'excel':
+        // إنشاء ملف Excel باستخدام XLSX
+        const ws = XLSX.utils.aoa_to_sheet([
+          ['name', 'phone', 'creditScore', 'paymentCommitment', 'hagglingLevel', 'purchaseWillingness', 'status', 'totalDebt', 'installmentAmount', 'lastPayment'],
+          ['أحمد محمد', '01012345678', 750, 85, 3, 8, 'excellent', 5000, 500, '2024-01-15'],
+          ['فاطمة علي', '01098765432', 680, 75, 5, 7, 'good', 3000, 300, '2024-01-10'],
+          ['محمد أحمد', '01055555555', 620, 70, 6, 6, 'fair', 8000, 800, '2024-01-05']
+        ]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'بيانات العملاء');
+        
+        // إضافة ورقة عمل للشرح
+        const explanationData = [
+          ['اسم العمود', 'الوصف', 'نوع البيانات', 'القيم المسموحة'],
+          ['name', 'اسم العميل الكامل', 'نص', 'أي نص'],
+          ['phone', 'رقم الهاتف', 'نص', 'أرقام فقط'],
+          ['creditScore', 'الدرجة الائتمانية', 'رقم', '300-850'],
+          ['paymentCommitment', 'التزام الدفع (%)', 'رقم', '0-100'],
+          ['hagglingLevel', 'مستوى المساومة', 'رقم', '1-10'],
+          ['purchaseWillingness', 'الرغبة في الشراء', 'رقم', '1-10'],
+          ['status', 'حالة العميل', 'نص', 'excellent, good, fair, poor'],
+          ['totalDebt', 'إجمالي الدين (اختياري)', 'رقم', 'أي رقم موجب'],
+          ['installmentAmount', 'مبلغ القسط (اختياري)', 'رقم', 'أي رقم موجب'],
+          ['lastPayment', 'آخر دفعة (اختياري)', 'تاريخ', 'YYYY-MM-DD']
+        ];
+        const explanationWs = XLSX.utils.aoa_to_sheet(explanationData);
+        XLSX.utils.book_append_sheet(wb, explanationWs, 'شرح الأعمدة');
+        
+        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'نموذج_بيانات_العملاء.xlsx';
+        link.click();
+        URL.revokeObjectURL(url);
+        return;
+      case 'word':
+        // إنشاء محتوى Word بسيط (HTML يمكن فتحه في Word)
+        content = `
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>نموذج بيانات العملاء</title>
+    <style>
+        body { font-family: Arial, sans-serif; direction: rtl; }
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        .header { color: #2c5aa0; margin-bottom: 20px; }
+        .description { margin-bottom: 15px; color: #666; }
+    </style>
+</head>
+<body>
+    <h1 class="header">نموذج بيانات العملاء</h1>
+    <p class="description">هذا نموذج لتنسيق بيانات العملاء المطلوب لاستيراد البيانات في النظام.</p>
+    
+    <h2>الأعمدة المطلوبة:</h2>
+    <table>
+        <tr><th>اسم العمود</th><th>الوصف</th><th>نوع البيانات</th><th>القيم المسموحة</th></tr>
+        <tr><td>name</td><td>اسم العميل الكامل</td><td>نص</td><td>أي نص</td></tr>
+        <tr><td>phone</td><td>رقم الهاتف</td><td>نص</td><td>أرقام فقط</td></tr>
+        <tr><td>creditScore</td><td>الدرجة الائتمانية</td><td>رقم</td><td>300-850</td></tr>
+        <tr><td>paymentCommitment</td><td>التزام الدفع (%)</td><td>رقم</td><td>0-100</td></tr>
+        <tr><td>hagglingLevel</td><td>مستوى المساومة</td><td>رقم</td><td>1-10</td></tr>
+        <tr><td>purchaseWillingness</td><td>الرغبة في الشراء</td><td>رقم</td><td>1-10</td></tr>
+        <tr><td>status</td><td>حالة العميل</td><td>نص</td><td>excellent, good, fair, poor</td></tr>
+    </table>
+    
+    <h2>الأعمدة الاختيارية:</h2>
+    <table>
+        <tr><th>اسم العمود</th><th>الوصف</th><th>نوع البيانات</th></tr>
+        <tr><td>totalDebt</td><td>إجمالي الدين</td><td>رقم موجب</td></tr>
+        <tr><td>installmentAmount</td><td>مبلغ القسط</td><td>رقم موجب</td></tr>
+        <tr><td>lastPayment</td><td>آخر دفعة</td><td>تاريخ (YYYY-MM-DD)</td></tr>
+    </table>
+    
+    <h2>مثال على البيانات:</h2>
+    <table>
+        <tr><th>name</th><th>phone</th><th>creditScore</th><th>paymentCommitment</th><th>hagglingLevel</th><th>purchaseWillingness</th><th>status</th></tr>
+        <tr><td>أحمد محمد</td><td>01012345678</td><td>750</td><td>85</td><td>3</td><td>8</td><td>excellent</td></tr>
+        <tr><td>فاطمة علي</td><td>01098765432</td><td>680</td><td>75</td><td>5</td><td>7</td><td>good</td></tr>
+    </table>
+    
+    <p><strong>ملاحظة:</strong> لاستيراد البيانات المنظمة، يرجى استخدام ملفات Excel أو CSV فقط.</p>
+</body>
+</html>`;
+        fileName = 'نموذج_بيانات_العملاء.doc';
+        mimeType = 'application/msword';
+        break;
+    }
+    
+    if (type !== 'excel') {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+    
+    toast({
+      title: t('import.downloadTemplate'),
+      description: `تم تحميل ${fileName}`,
+    });
+  }, [t, toast]);
   return (
     <div className="space-y-4">
+      {/* قسم الملفات المثالية */}
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">{t('import.title')}</h3>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              {t('btn.idealFile')}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => handleDownloadTemplate('word')}>
+              <FileText className="h-4 w-4 mr-2" />
+              {t('btn.idealWord')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDownloadTemplate('excel')}>
+              <FileText className="h-4 w-4 mr-2" />
+              {t('btn.idealExcel')}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDownloadTemplate('csv')}>
+              <FileText className="h-4 w-4 mr-2" />
+              {t('btn.idealCsv')}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
             isDragging
@@ -189,7 +356,7 @@ export default function DataImport({ onDataImported }: DataImportProps) {
             onClick={() => {
               const input = document.createElement('input');
               input.type = 'file';
-              input.accept = '.xlsx,.xls,.csv';
+              input.accept = '.xlsx,.xls,.csv,.docx,.doc,.pdf';
               input.onchange = (e) => {
                 const target = e.target as HTMLInputElement;
                 handleFileSelect(target.files);
@@ -227,8 +394,8 @@ export default function DataImport({ onDataImported }: DataImportProps) {
 
         <div className="text-xs text-gray-500 space-y-1">
           <p><strong>{t('import.supportedColumns')}:</strong> name, phone, creditScore, paymentCommitment, hagglingLevel, purchaseWillingness, status</p>
-          <p><strong>Optional columns:</strong> totalDebt, installmentAmount, lastPayment</p>
-          <p><strong>Status values:</strong> excellent, good, fair, poor</p>
+          <p><strong>{t('import.optionalColumns')}:</strong> totalDebt, installmentAmount, lastPayment</p>
+          <p><strong>{t('import.statusValues')}:</strong> excellent, good, fair, poor</p>
         </div>
     </div>
   );
