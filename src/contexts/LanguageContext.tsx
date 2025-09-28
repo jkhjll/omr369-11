@@ -145,6 +145,19 @@ const translations = {
     'reports.noReports': 'لا توجد تقارير',
     'reports.noReportsDesc': 'ابدأ بإنشاء تقارير تحليلية لبيانات العملاء والدفعات',
     'reports.createFirst': 'إنشاء أول تقرير',
+
+    // Data Import
+    'import.title': 'استيراد البيانات',
+    'import.description': 'قم بتحميل ملف Excel أو CSV يحتوي على بيانات العملاء',
+    'import.selectFile': 'اختر الملف',
+    'import.processing': 'جاري المعالجة...',
+    'import.import': 'استيراد',
+    'import.success': 'تم الاستيراد بنجاح!',
+    'import.customersImported': 'عميل تم استيرادهم',
+    'import.missingData': 'بيانات مفقودة في الصف',
+    'import.noValidData': 'لا توجد بيانات صالحة في الملف',
+    'import.processingError': 'خطأ في معالجة الملف',
+    'import.supportedColumns': 'الأعمدة المدعومة',
   },
   en: {
     // Header
@@ -279,6 +292,19 @@ const translations = {
     'reports.noReports': 'No reports available',
     'reports.noReportsDesc': 'Start by creating analytical reports for customer and payment data',
     'reports.createFirst': 'Create First Report',
+
+    // Data Import
+    'import.title': 'Import Data',
+    'import.description': 'Upload an Excel or CSV file containing customer data',
+    'import.selectFile': 'Select File',
+    'import.processing': 'Processing...',
+    'import.import': 'Import',
+    'import.success': 'Import successful!',
+    'import.customersImported': 'customers imported',
+    'import.missingData': 'Missing data in row',
+    'import.noValidData': 'No valid data found in file',
+    'import.processingError': 'Error processing file',
+    'import.supportedColumns': 'Supported Columns',
   }
 };
 
