@@ -121,14 +121,23 @@ export const useCustomers = () => {
         throw new Error('يجب تسجيل الدخول أولاً');
       }
 
-      const dbCustomer = {
-        ...transformToDatabase(customerData),
+      const insertPayload = {
         user_id: session.session.user.id,
+        name: customerData.name,
+        phone: customerData.phone,
+        credit_score: customerData.creditScore,
+        payment_commitment: customerData.paymentCommitment,
+        haggling_level: customerData.hagglingLevel,
+        purchase_willingness: customerData.purchaseWillingness,
+        last_payment: customerData.lastPayment || null,
+        total_debt: customerData.totalDebt,
+        installment_amount: customerData.installmentAmount,
+        status: customerData.status,
       };
 
       const { data, error } = await supabase
         .from('customers')
-        .insert([dbCustomer])
+        .insert([insertPayload])
         .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, installment_amount, status, created_at, updated_at, user_id')
         .single();
 
@@ -146,7 +155,8 @@ export const useCustomers = () => {
 
       return true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في إضافة العميل';
+      console.error("Supabase addCustomer error:", err); // تسجيل الخطأ الكامل في الكونسول
+      const errorMessage = err instanceof Error ? err.message : 'حدث خطأ غير معروف أثناء إضافة العميل';
       toast({
         title: "خطأ في إضافة العميل",
         description: errorMessage,
