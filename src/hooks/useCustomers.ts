@@ -155,48 +155,6 @@ export const useCustomers = () => {
     }
   };
 
-  // إضافة عملاء متعددين (للاستيراد)
-  const addMultipleCustomers = async (customersData: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[]): Promise<{ success: boolean; count: number }> => {
-    try {
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
-        throw new Error('يجب تسجيل الدخول أولاً');
-      }
-
-      const dbCustomers = customersData.map(customer => ({
-        ...transformToDatabase(customer),
-        user_id: session.session.user.id,
-      }));
-
-      const { data, error } = await supabase
-        .from('customers')
-        .insert(dbCustomers)
-        .select('id, name, phone, credit_score, payment_commitment, haggling_level, purchase_willingness, last_payment, total_debt, status, created_at, updated_at, user_id');
-
-      if (error) {
-        throw error;
-      }
-
-      const newCustomers = (data || []).map((item: any) => transformFromDatabase(item));
-      setCustomers(prev => [...newCustomers, ...prev]);
-      
-      toast({
-        title: "تم استيراد البيانات بنجاح",
-        description: `تم إضافة ${newCustomers.length} عميل جديد إلى قاعدة البيانات`,
-      });
-
-      return { success: true, count: newCustomers.length };
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في استيراد البيانات';
-      toast({
-        title: "خطأ في استيراد البيانات",
-        description: errorMessage,
-        variant: "destructive",
-      });
-      return { success: false, count: 0 };
-    }
-  };
-
   // تحديث عميل
   const updateCustomer = async (id: string, customerData: Partial<Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>>): Promise<boolean> => {
     try {
@@ -289,7 +247,6 @@ export const useCustomers = () => {
     loading,
     error,
     addCustomer,
-    addMultipleCustomers,
     updateCustomer,
     deleteCustomer,
     refetch: fetchCustomers,

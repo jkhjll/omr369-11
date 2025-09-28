@@ -3,16 +3,13 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { CustomerCard } from "@/components/CustomerCard";
 import { CreditLimitCalculator } from "@/components/CreditLimitCalculator";
 import { PaymentAnalysis } from "@/components/PaymentAnalysis";
-import DataImport from "@/components/DataImport";
 import { AddCustomer } from "@/components/AddCustomer";
 import { ReportsSection } from "@/components/ReportsSection";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Search, Filter, Download, Users, Loader as Loader2 } from "lucide-react";
-import { Upload } from "lucide-react";
 import { useCustomers, CustomerData } from "@/hooks/useCustomers";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
@@ -21,7 +18,6 @@ const Index = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>("");
   const { 
@@ -29,7 +25,6 @@ const Index = () => {
     loading, 
     error, 
     addCustomer, 
-    addMultipleCustomers,
     updateCustomer,
     deleteCustomer 
   } = useCustomers();
@@ -44,14 +39,6 @@ const Index = () => {
     const customer = customers.find(c => c.id === customerId);
     setSelectedCustomer(customerId);
     setSelectedCustomerName(customer?.name || "");
-  };
-
-  // دالة معالجة استيراد البيانات مع إغلاق النافذة المنبثقة عند النجاح
-  const handleDataImported = async (importedData: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>[]) => {
-    const result = await addMultipleCustomers(importedData);
-    if (result.success) {
-      setIsImportDialogOpen(false); // إغلاق النافذة المنبثقة عند نجاح الاستيراد
-    }
   };
 
   const handleCustomerAdded = async (newCustomer: CustomerData & { id: string }) => {
@@ -113,20 +100,6 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-2">
                 <AddCustomer onCustomerAdded={handleCustomerAdded} />
-                <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button className="gradient-accent text-accent-foreground">
-                      <Upload className="h-4 w-4 ml-2" />
-                      {t('btn.importData')}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-w-2xl [&>button]:left-4 [&>button]:right-auto">
-                    <DialogHeader>
-                      <DialogTitle className="text-right">{t('import.title')}</DialogTitle>
-                    </DialogHeader>
-                    <DataImport onDataImported={handleDataImported} />
-                  </DialogContent>
-                </Dialog>
                 <Button 
                   onClick={handleExportData}
                   disabled={customers.length === 0}
