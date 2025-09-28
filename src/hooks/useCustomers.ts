@@ -21,7 +21,7 @@ export interface CustomerData {
 export interface DatabaseCustomer {
   id: string;
   user_id: string;
-  customer_code: string;
+  customer_code?: string;
   name: string;
   phone: string;
   credit_score: number;
@@ -36,9 +36,9 @@ export interface DatabaseCustomer {
 }
 
 // تحويل من نموذج قاعدة البيانات إلى نموذج التطبيق
-const transformFromDatabase = (dbCustomer: DatabaseCustomer): CustomerData => ({
+const transformFromDatabase = (dbCustomer: any): CustomerData => ({
   id: dbCustomer.id,
-  customerCode: dbCustomer.customer_code,
+  customerCode: dbCustomer.customer_code || `CU${Date.now()}`,
   name: dbCustomer.name,
   phone: dbCustomer.phone,
   creditScore: dbCustomer.credit_score,

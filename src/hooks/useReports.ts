@@ -26,7 +26,7 @@ interface DatabaseReport {
 }
 
 // تحويل من نموذج قاعدة البيانات إلى نموذج التطبيق
-const transformFromDatabase = (dbReport: DatabaseReport): Report => ({
+const transformFromDatabase = (dbReport: any): Report => ({
   id: dbReport.id,
   title: dbReport.title,
   description: dbReport.description || '',
@@ -64,7 +64,7 @@ export const useReports = () => {
         return;
       }
 
-      const { data, error: fetchError } = await (supabase as any)
+      const { data, error: fetchError } = await supabase
         .from('reports')
         .select('*')
         .order('created_at', { ascending: false });
@@ -101,7 +101,7 @@ export const useReports = () => {
         user_id: session.session.user.id,
       };
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('reports')
         .insert([dbReport])
         .select()
@@ -136,7 +136,7 @@ export const useReports = () => {
     try {
       const dbUpdate = transformToDatabase(reportData as any);
       
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('reports')
         .update(dbUpdate)
         .eq('id', id)
@@ -172,7 +172,7 @@ export const useReports = () => {
   // حذف تقرير
   const deleteReport = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('reports')
         .delete()
         .eq('id', id);

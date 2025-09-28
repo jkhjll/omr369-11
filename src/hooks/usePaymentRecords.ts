@@ -30,7 +30,7 @@ interface DatabasePaymentRecord {
 }
 
 // تحويل من نموذج قاعدة البيانات إلى نموذج التطبيق
-const transformFromDatabase = (dbRecord: DatabasePaymentRecord): PaymentRecord => ({
+const transformFromDatabase = (dbRecord: any): PaymentRecord => ({
   id: dbRecord.id,
   customerId: dbRecord.customer_id,
   dueDate: dbRecord.due_date,
@@ -72,7 +72,7 @@ export const usePaymentRecords = (customerId?: string) => {
         return;
       }
 
-      let query = (supabase as any)
+      let query = supabase
         .from('payment_records')
         .select('*')
         .order('due_date', { ascending: false });
@@ -115,7 +115,7 @@ export const usePaymentRecords = (customerId?: string) => {
         user_id: session.session.user.id,
       };
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('payment_records')
         .insert([dbRecord])
         .select()
@@ -150,7 +150,7 @@ export const usePaymentRecords = (customerId?: string) => {
     try {
       const dbUpdate = transformToDatabase(recordData as any);
       
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('payment_records')
         .update(dbUpdate)
         .eq('id', id)
@@ -186,7 +186,7 @@ export const usePaymentRecords = (customerId?: string) => {
   // حذف سجل دفع
   const deletePaymentRecord = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('payment_records')
         .delete()
         .eq('id', id);
