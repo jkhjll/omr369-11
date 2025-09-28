@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   const stats = [
     {
