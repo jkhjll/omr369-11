@@ -57,20 +57,18 @@ const transformFromDatabase = (dbCustomer: any): CustomerData => ({
 
 // تحويل من نموذج التطبيق إلى نموذج قاعدة البيانات
 const transformToDatabase = (customer: Omit<CustomerData, 'id' | 'createdAt' | 'updatedAt'>) => {
-  // Explicitly exclude client-side only fields (customerCode only)
-  const { customerCode, ...dbFields } = customer;
-  
   return {
-    name: dbFields.name,
-    phone: dbFields.phone,
-    credit_score: dbFields.creditScore,
-    payment_commitment: dbFields.paymentCommitment,
-    haggling_level: dbFields.hagglingLevel,
-    purchase_willingness: dbFields.purchaseWillingness,
-    last_payment: dbFields.lastPayment || null,
-    total_debt: dbFields.totalDebt,
-    installment_amount: dbFields.installmentAmount || 0,
-    status: dbFields.status,
+    name: customer.name,
+    phone: customer.phone,
+    credit_score: customer.creditScore,
+    payment_commitment: customer.paymentCommitment,
+    haggling_level: customer.hagglingLevel,
+    purchase_willingness: customer.purchaseWillingness,
+    last_payment: customer.lastPayment || null,
+    total_debt: customer.totalDebt,
+    installment_amount: customer.installmentAmount || 0,
+    status: customer.status,
+    customer_code: customer.customerCode,
   };
 };
 

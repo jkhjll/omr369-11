@@ -52,7 +52,6 @@ const Index = () => {
     if (result.success) {
       setIsImportDialogOpen(false); // إغلاق النافذة المنبثقة عند نجاح الاستيراد
     }
-    await addMultipleCustomers(customersData);
   };
 
   const handleCustomerAdded = async (newCustomer: CustomerData & { id: string }) => {
