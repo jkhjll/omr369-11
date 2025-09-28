@@ -93,7 +93,7 @@ export const useCustomers = () => {
         throw fetchError;
       }
 
-      const transformedCustomers = (data || []).map(transformFromDatabase);
+      const transformedCustomers = (data || []).map((item: any) => transformFromDatabase(item));
       setCustomers(transformedCustomers);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب البيانات';
@@ -131,7 +131,7 @@ export const useCustomers = () => {
         throw error;
       }
 
-      const newCustomer = transformFromDatabase(data);
+      const newCustomer = transformFromDatabase(data as any);
       setCustomers(prev => [newCustomer, ...prev]);
       
       toast({
@@ -173,7 +173,7 @@ export const useCustomers = () => {
         throw error;
       }
 
-      const newCustomers = (data || []).map(transformFromDatabase);
+      const newCustomers = (data || []).map((item: any) => transformFromDatabase(item));
       setCustomers(prev => [...newCustomers, ...prev]);
       
       toast({
@@ -209,7 +209,7 @@ export const useCustomers = () => {
         throw error;
       }
 
-      const updatedCustomer = transformFromDatabase(data);
+      const updatedCustomer = transformFromDatabase(data as any);
       setCustomers(prev => prev.map(customer => 
         customer.id === id ? updatedCustomer : customer
       ));

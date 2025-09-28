@@ -64,7 +64,7 @@ export const useReports = () => {
         return;
       }
 
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await (supabase as any)
         .from('reports')
         .select('*')
         .order('created_at', { ascending: false });
@@ -73,7 +73,7 @@ export const useReports = () => {
         throw fetchError;
       }
 
-      const transformedReports = (data || []).map(transformFromDatabase);
+      const transformedReports = (data || []).map((item: any) => transformFromDatabase(item));
       setReports(transformedReports);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب التقارير';
@@ -101,7 +101,7 @@ export const useReports = () => {
         user_id: session.session.user.id,
       };
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('reports')
         .insert([dbReport])
         .select()
@@ -111,7 +111,7 @@ export const useReports = () => {
         throw error;
       }
 
-      const newReport = transformFromDatabase(data);
+      const newReport = transformFromDatabase(data as any);
       setReports(prev => [newReport, ...prev]);
       
       toast({
@@ -136,7 +136,7 @@ export const useReports = () => {
     try {
       const dbUpdate = transformToDatabase(reportData as any);
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('reports')
         .update(dbUpdate)
         .eq('id', id)
@@ -147,7 +147,7 @@ export const useReports = () => {
         throw error;
       }
 
-      const updatedReport = transformFromDatabase(data);
+      const updatedReport = transformFromDatabase(data as any);
       setReports(prev => prev.map(report => 
         report.id === id ? updatedReport : report
       ));
@@ -172,7 +172,7 @@ export const useReports = () => {
   // حذف تقرير
   const deleteReport = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('reports')
         .delete()
         .eq('id', id);

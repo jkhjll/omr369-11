@@ -72,7 +72,7 @@ export const usePaymentRecords = (customerId?: string) => {
         return;
       }
 
-      let query = supabase
+      let query = (supabase as any)
         .from('payment_records')
         .select('*')
         .order('due_date', { ascending: false });
@@ -87,7 +87,7 @@ export const usePaymentRecords = (customerId?: string) => {
         throw fetchError;
       }
 
-      const transformedRecords = (data || []).map(transformFromDatabase);
+      const transformedRecords = (data || []).map((item: any) => transformFromDatabase(item));
       setPaymentRecords(transformedRecords);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'حدث خطأ في جلب سجلات الدفع';
@@ -115,7 +115,7 @@ export const usePaymentRecords = (customerId?: string) => {
         user_id: session.session.user.id,
       };
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('payment_records')
         .insert([dbRecord])
         .select()
@@ -125,7 +125,7 @@ export const usePaymentRecords = (customerId?: string) => {
         throw error;
       }
 
-      const newRecord = transformFromDatabase(data);
+      const newRecord = transformFromDatabase(data as any);
       setPaymentRecords(prev => [newRecord, ...prev]);
       
       toast({
@@ -150,7 +150,7 @@ export const usePaymentRecords = (customerId?: string) => {
     try {
       const dbUpdate = transformToDatabase(recordData as any);
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('payment_records')
         .update(dbUpdate)
         .eq('id', id)
@@ -161,7 +161,7 @@ export const usePaymentRecords = (customerId?: string) => {
         throw error;
       }
 
-      const updatedRecord = transformFromDatabase(data);
+      const updatedRecord = transformFromDatabase(data as any);
       setPaymentRecords(prev => prev.map(record => 
         record.id === id ? updatedRecord : record
       ));
@@ -186,7 +186,7 @@ export const usePaymentRecords = (customerId?: string) => {
   // حذف سجل دفع
   const deletePaymentRecord = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('payment_records')
         .delete()
         .eq('id', id);
