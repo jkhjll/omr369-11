@@ -3,7 +3,7 @@ import { DashboardLayout } from "@/components/DashboardLayout";
 import { CustomerCard } from "@/components/CustomerCard";
 import { CreditLimitCalculator } from "@/components/CreditLimitCalculator";
 import { PaymentAnalysis } from "@/components/PaymentAnalysis";
-import { DataImport } from "@/components/DataImport";
+import DataImport from "@/components/DataImport";
 import { AddCustomer } from "@/components/AddCustomer";
 import { ReportsSection } from "@/components/ReportsSection";
 import { Card } from "@/components/ui/card";
