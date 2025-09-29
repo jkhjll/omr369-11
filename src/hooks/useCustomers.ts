@@ -143,6 +143,7 @@ export const useCustomers = () => {
         ...transformToDatabase(customerData),
       };
 
+      console.log('Insert payload (customers):', insertPayload);
       const { data, error } = await supabase
         .from('customers')
         .insert([insertPayload])
