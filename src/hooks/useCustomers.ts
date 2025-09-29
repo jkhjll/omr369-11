@@ -140,16 +140,7 @@ export const useCustomers = () => {
 
       const insertPayload = {
         user_id: session.user.id,
-        name: customerData.name,
-        phone: customerData.phone,
-        credit_score: customerData.creditScore,
-        payment_commitment: customerData.paymentCommitment,
-        negotiation_level: customerData.hagglingLevel,
-        willingness_to_buy: customerData.purchaseWillingness,
-        last_payment_date: customerData.lastPayment || null,
-        total_debt: customerData.totalDebt,
-        installment_amount: customerData.installmentAmount,
-        status: customerData.status,
+        ...transformToDatabase(customerData),
       };
 
       const { data, error } = await supabase
