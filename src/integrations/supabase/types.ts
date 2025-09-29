@@ -60,64 +60,56 @@ export type Database = {
           user_id?: string
           years_with_store?: number
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_credit_calculations_customer"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       customers: {
         Row: {
-          created_at: string
-          credit_score: number
-          customer_code: string | null
-          haggling_level: number
+          created_at: string | null
+          credit_score: number | null
+          customer_code: string
           id: string
-          last_payment: string | null
+          installment_amount: number | null
+          last_payment_date: string | null
           name: string
-          payment_commitment: number
+          negotiation_level: number | null
+          payment_commitment: number | null
           phone: string
-          purchase_willingness: number
-          status: string
-          total_debt: number
-          updated_at: string
-          user_id: string
+          status: string | null
+          total_debt: number | null
+          user_id: string | null
+          willingness_to_buy: number | null
         }
         Insert: {
-          created_at?: string
-          credit_score: number
-          customer_code?: string | null
-          haggling_level: number
+          created_at?: string | null
+          credit_score?: number | null
+          customer_code?: string
           id?: string
-          last_payment?: string | null
+          installment_amount?: number | null
+          last_payment_date?: string | null
           name: string
-          payment_commitment: number
+          negotiation_level?: number | null
+          payment_commitment?: number | null
           phone: string
-          purchase_willingness: number
-          status: string
-          total_debt?: number
-          updated_at?: string
-          user_id: string
+          status?: string | null
+          total_debt?: number | null
+          user_id?: string | null
+          willingness_to_buy?: number | null
         }
         Update: {
-          created_at?: string
-          credit_score?: number
-          customer_code?: string | null
-          haggling_level?: number
+          created_at?: string | null
+          credit_score?: number | null
+          customer_code?: string
           id?: string
-          last_payment?: string | null
+          installment_amount?: number | null
+          last_payment_date?: string | null
           name?: string
-          payment_commitment?: number
+          negotiation_level?: number | null
+          payment_commitment?: number | null
           phone?: string
-          purchase_willingness?: number
-          status?: string
-          total_debt?: number
-          updated_at?: string
-          user_id?: string
+          status?: string | null
+          total_debt?: number | null
+          user_id?: string | null
+          willingness_to_buy?: number | null
         }
         Relationships: []
       }
@@ -161,15 +153,28 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "fk_payment_records_customer"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "customers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      report_data: {
+        Row: {
+          created_at: string | null
+          id: string
+          report_text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          report_text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          report_text?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       reports: {
         Row: {
@@ -212,7 +217,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_customer_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
